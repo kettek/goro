@@ -16,17 +16,17 @@ var (
 )
 
 // SetTitle sets the backend window's title.
-func (backend *BackendTCell) SetTitle(title string) error {
+func (backend *BackendTCell) SetTitle(title string) {
 	// This is a bogus way to check if we're in a Windows console or not, but...
 	if backend.tcellScreen.CharacterSet() == "UTF-16LE" {
 		_, _, err := procSetConsoleTitleA.Call(
 			uintptr(unsafe.Pointer(StringToCharPtr(title))),
 		)
 		if err != syscall.Errno(0) {
-			return err
+			return
 		}
 	} else {
 		fmt.Printf("\033]0;" + title + "\007")
 	}
-	return nil
+	return
 }
