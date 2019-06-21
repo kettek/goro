@@ -2,6 +2,8 @@
 
 package goro
 
+// #include <stdlib.h>
+import "C"
 import (
 	"fmt"
 	"syscall"
