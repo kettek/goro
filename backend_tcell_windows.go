@@ -19,8 +19,10 @@ var (
 func (backend *BackendTCell) SetTitle(title string) {
 	// This is a bogus way to check if we're in a Windows console or not, but...
 	if backend.tcellScreen.CharacterSet() == "UTF-16LE" {
+    cstr := C.CString(title)
+    defer C.free(unsafe.Pointer(cstr))
 		_, _, err := procSetConsoleTitleA.Call(
-			uintptr(unsafe.Pointer(StringToCharPtr(title))),
+			uintptr(unsafe.Pointer(cstr)),
 		)
 		if err != syscall.Errno(0) {
 			return
