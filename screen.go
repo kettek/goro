@@ -66,7 +66,13 @@ func (screen *Screen) Sync() (err error) {
 	}
 	// Iterate through our rows to grow or shrink their columns.
 	for y := range screen.cells {
-		screen.cells[y] = screen.cells[y][:screen.Columns]
+		currColumns := len(screen.cells[y])
+		// Grow or shrink our columns.
+		if currColumns < screen.Columns {
+			screen.cells[y] = append(screen.cells[y], make([]Cell, screen.Columns-currColumns)...)
+		} else if currColumns > screen.Columns {
+			screen.cells[y] = screen.cells[y][:screen.Columns]
+		}
 	}
 	return nil
 }
