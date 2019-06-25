@@ -18,8 +18,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package goro
 
+// Key is our type representing keyboard codes.
 type Key uint8
 
+// These are our constant key variables.
 const (
 	KeyNull Key = iota
 	_
@@ -168,8 +170,10 @@ const (
 	KeyDown
 )
 
+// Mod represents a modifier key state.
 type Mod uint8
 
+// These are our const modifier variables.
 const (
 	ModShift Mod = 1 << iota
 	ModCtrl

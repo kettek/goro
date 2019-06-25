@@ -84,14 +84,20 @@ func (screen *Screen) Sync() (err error) {
 	return nil
 }
 
-// DrawRune draws a given rune at the position of x and y with a given style.
-func (screen *Screen) DrawRune(x int, y int, r rune, s Style) error {
+func (screen *Screen) checkBounds(x, y int) error {
 	if y < 0 || y >= len(screen.cells) {
 		return errors.New("y out of range")
 	}
-
 	if x < 0 || x >= len(screen.cells[y]) {
 		return errors.New("x out of range")
+	}
+	return nil
+}
+
+// DrawRune draws a given rune at the position of x and y with a given style.
+func (screen *Screen) DrawRune(x int, y int, r rune, s Style) error {
+	if err := screen.checkBounds(x, y); err != nil {
+		return err
 	}
 	screen.cells[y][x].PendingRune = r
 	screen.cells[y][x].PendingStyle = s
@@ -107,6 +113,46 @@ func (screen *Screen) DrawString(x int, y int, str string, s Style) error {
 		}
 		x++
 	}
+	return nil
+}
+
+// SetForeground sets the foreground at the given location.
+func (screen *Screen) SetForeground(x int, y int, c Color) error {
+	if err := screen.checkBounds(x, y); err != nil {
+		return err
+	}
+	screen.cells[y][x].PendingStyle.Foreground = c
+	screen.cells[y][x].Dirty = true
+	return nil
+}
+
+// SetBackground sets the background at the given location.
+func (screen *Screen) SetBackground(x int, y int, c Color) error {
+	if err := screen.checkBounds(x, y); err != nil {
+		return err
+	}
+	screen.cells[y][x].PendingStyle.Background = c
+	screen.cells[y][x].Dirty = true
+	return nil
+}
+
+// SetStyle sets the style at the given location.
+func (screen *Screen) SetStyle(x int, y int, s Style) error {
+	if err := screen.checkBounds(x, y); err != nil {
+		return err
+	}
+	screen.cells[y][x].PendingStyle = s
+	screen.cells[y][x].Dirty = true
+	return nil
+}
+
+// SetRune sets the rune at the given location.
+func (screen *Screen) SetRune(x int, y int, r rune) error {
+	if err := screen.checkBounds(x, y); err != nil {
+		return err
+	}
+	screen.cells[y][x].PendingRune = r
+	screen.cells[y][x].Dirty = true
 	return nil
 }
 

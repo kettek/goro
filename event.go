@@ -37,6 +37,7 @@ type EventKey struct {
 	Meta  bool
 }
 
+// HasModifiers returns if any modifier keys were held.
 func (e EventKey) HasModifiers() bool {
 	return e.Shift || e.Ctrl || e.Alt || e.Meta
 }
