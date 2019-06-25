@@ -42,11 +42,6 @@ func (screen *Screen) Init() (err error) {
 	screen.active = true
 	screen.UseKeys = true
 
-	screen.cells = make([][]Cell, screen.Rows)
-	for y := 0; y < screen.Rows; y++ {
-		screen.cells[y] = make([]Cell, screen.Columns)
-	}
-
 	return screen.Sync()
 }
 
@@ -62,24 +57,16 @@ func (screen *Screen) Close() {
 
 // Sync synchronizes the screen's actual cells with the current Rows and Columns.
 func (screen *Screen) Sync() (err error) {
-	if len(screen.cells) < screen.Rows {
-		// grow Y
-		for y := len(screen.cells) - 1; y < screen.Rows; y++ {
-			if len(screen.cells[y])-1 < screen.Columns {
-				// grow X
-			} else if len(screen.cells[y])-1 > screen.Columns {
-				// shrink X
-			}
-		}
-	} else if len(screen.cells)-1 > screen.Rows {
-		for y := len(screen.cells) - 1; y < screen.Rows; y++ {
-			// shrink Y
-			if len(screen.cells[y])-1 < screen.Columns {
-				// grow X
-			} else if len(screen.cells[y])-1 > screen.Columns {
-				// shrink X
-			}
-		}
+	currRows := len(screen.cells)
+	// Grow or shrink our rows.
+	if currRows < screen.Rows {
+		screen.cells = append(screen.cells, make([]Cell, screen.Rows-currRows))
+	} else if currRows > screen.Rows {
+		screen.cells = screen.cells[:screen.Rows]
+	}
+	// Iterate through our rows to grow or shrink their columns.
+	for y := range screen.cells {
+		screen.cells[y] = screen.cells[y][:screen.Columns]
 	}
 	return nil
 }
@@ -183,13 +170,25 @@ func (screen *Screen) Flush() {
 	globalBackend.Refresh()
 }
 
-// Size returns the current screen window dimensions.
+// Size returns the current screen columns by rows.
 func (screen *Screen) Size() (int, int) {
+	return screen.Columns, screen.Rows
+}
+
+// SetSize sets the screen's columns and rows.
+func (screen *Screen) SetSize(c, r int) {
+	screen.Columns = c
+	screen.Rows = r
+	screen.Sync()
+}
+
+// WindowSize returns the current backend's window size in its preferred units, if available.
+func (screen *Screen) WindowSize() (int, int) {
 	return globalBackend.Size()
 }
 
-// SetSize sets the screen window to the provided width and height. Does nothing.
-func (screen *Screen) SetSize(w, h int) {
+// SetWindowSize sets the current backend's window to the provided width and height in the backend's units, if available.
+func (screen *Screen) SetWindowSize(w, h int) {
 	globalBackend.SetSize(w, h)
 }
 
