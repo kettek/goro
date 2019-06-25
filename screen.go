@@ -70,6 +70,10 @@ func (screen *Screen) Sync() (err error) {
 		// Grow or shrink our columns.
 		if currColumns < screen.Columns {
 			screen.cells[y] = append(screen.cells[y], make([]Cell, screen.Columns-currColumns)...)
+			// Mark new cells as dirty
+			for x := currColumns; x < screen.Columns; x++ {
+				screen.cells[y][x].Dirty = true
+			}
 		} else if currColumns > screen.Columns {
 			screen.cells[y] = screen.cells[y][:screen.Columns]
 		}
