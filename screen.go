@@ -60,7 +60,7 @@ func (screen *Screen) Sync() (err error) {
 	currRows := len(screen.cells)
 	// Grow or shrink our rows.
 	if currRows < screen.Rows {
-		screen.cells = append(screen.cells, make([]Cell, screen.Rows-currRows))
+		screen.cells = append(screen.cells, make([][]Cell, screen.Rows-currRows)...)
 	} else if currRows > screen.Rows {
 		screen.cells = screen.cells[:screen.Rows]
 	}
