@@ -116,7 +116,7 @@ func (backend *BackendTCell) SetSize(w, h int) {
 }
 
 // Units returns the unit type the backend uses for Size().
-func (backend *BackendTCell) Units() {
+func (backend *BackendTCell) Units() int {
 	return UnitCells
 }
 
