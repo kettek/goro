@@ -135,6 +135,11 @@ func (backend *BackendEbiten) SetSize(w, h int) {
 	ebiten.SetScreenSize(w, h)
 }
 
+// Units returns the unit type the backend uses for Size().
+func (backend *BackendEbiten) Units() int {
+	return UnitPixels
+}
+
 // Scale returns the current backend window scaling.
 func (backend *BackendEbiten) Scale() float64 {
 	return ebiten.ScreenScale()

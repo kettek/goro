@@ -108,11 +108,16 @@ func (backend *BackendTCell) Refresh() {
 
 // Size returns the current backend window dimensions.
 func (backend *BackendTCell) Size() (int, int) {
-	return 0, 0
+	return backend.tcellScreen.Size()
 }
 
 // SetSize sets the backend window to the provided width and height. Does nothing.
 func (backend *BackendTCell) SetSize(w, h int) {
+}
+
+// Units returns the unit type the backend uses for Size().
+func (backend *BackendTCell) Units() {
+	return UnitCells
 }
 
 // Scale returns the current backend window scaling. Does nothing.
