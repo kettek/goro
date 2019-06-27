@@ -1,3 +1,7 @@
+// +build enableEbiten,!disableEbiten
+
+package goro
+
 /*
 This file is a part of goRo, a library for writing roguelikes.
 Copyright (C) 2019 Ketchetwahmeegwun T. Southall
@@ -15,10 +19,6 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
-// +build enableEbiten,!disableEbiten
-
-package goro
 
 import (
 	"fmt"
