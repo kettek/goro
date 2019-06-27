@@ -5,8 +5,6 @@ import (
 	"time"
 )
 
-var Random *rand.Rand
-
 func SetSeed(seed int64) {
 	source := rand.NewSource(seed)
 	Random = rand.New(source)
@@ -15,3 +13,6 @@ func SetSeed(seed int64) {
 func RandomSeed() int64 {
 	return time.Now().UnixNano()
 }
+
+// Ensure random is set to something!
+var Random *rand.Rand = rand.New(rand.NewSource(0))
