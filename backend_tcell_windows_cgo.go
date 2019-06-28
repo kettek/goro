@@ -1,4 +1,4 @@
-// +build windows,!disableTCell
+// +build windows,cgo,!disableTCell
 
 package goro
 /*
@@ -19,6 +19,35 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// SetTitle sets the backend window's title. This does nothing for non-CGO builds.
+// #include <stdlib.h>
+import "C"
+import (
+	"fmt"
+	"syscall"
+	"unsafe"
+
+	"golang.org/x/sys/windows"
+)
+
+var (
+	kernel32DLL          = windows.NewLazyDLL("kernel32.dll")
+	procSetConsoleTitleA = kernel32DLL.NewProc("SetConsoleTitleA")
+)
+
+// SetTitle sets the backend window's title.
 func (backend *BackendTCell) SetTitle(title string) {
+	// This is a bogus way to check if we're in a Windows console or not, but...
+	if backend.tcellScreen.CharacterSet() == "UTF-16LE" {
+		cstr := C.CString(title)
+		defer C.free(unsafe.Pointer(cstr))
+		_, _, err := procSetConsoleTitleA.Call(
+			uintptr(unsafe.Pointer(cstr)),
+		)
+		if err != syscall.Errno(0) {
+			return
+		}
+	} else {
+		fmt.Printf("\033]0;" + title + "\007")
+	}
+	return
 }
