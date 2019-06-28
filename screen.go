@@ -31,16 +31,24 @@ type Screen struct {
 	eventChan        chan Event
 	UseKeys          bool
 	UseMouse         bool
+	AutoSize         bool
 	Redraw           bool
 }
 
 // Init initializes the Screen's data structures and default values.
 func (screen *Screen) Init() (err error) {
 	screen.eventChan = make(chan Event, 10)
-	screen.Columns = 80
-	screen.Rows = 24
+	// Assign our Screen size to either the backend's columns and rows if it uses Cells for units, otherwise use a standard 80x24 size.
+	if globalBackend != nil {
+		if globalBackend.Units() == UnitCells {
+			screen.Columns, screen.Rows = globalBackend.Size()
+		} else {
+			screen.Columns, screen.Rows = 80, 24
+		}
+	}
 	screen.active = true
 	screen.UseKeys = true
+	screen.AutoSize = true
 
 	return screen.Sync()
 }

@@ -22,8 +22,9 @@ package goro
 type Event interface {
 }
 
-// EventScreen represents screen changes such as terminal resizing.
-type EventScreen struct {
+// EventResize represents screen changes such as terminal resizing.
+type EventResize struct {
+	Columns, Rows int
 }
 
 // EventKey represents a keypress event.

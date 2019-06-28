@@ -84,8 +84,15 @@ func (backend *BackendTCell) Run(cb func(*Screen)) (err error) {
 		event := backend.tcellScreen.PollEvent()
 		switch event := event.(type) {
 		case *tcell.EventResize:
+			w, h := event.Size()
+			if backend.screen.AutoSize {
+				backend.screen.SetSize(w, h)
+			}
 			backend.tcellScreen.Sync()
-			backend.screen.eventChan <- Event(EventScreen{})
+			backend.screen.eventChan <- Event(EventResize{
+				Columns: w,
+				Rows:    h,
+			})
 		case *tcell.EventKey:
 			if backend.screen.UseKeys {
 				backend.screen.eventChan <- Event(backend.tCellEventKeyToEventKey(event))
