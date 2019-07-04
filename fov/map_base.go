@@ -71,7 +71,7 @@ func (fovMap *MapBase) BlocksMovement(x, y int) bool {
 	if err := fovMap.CheckBounds(x, y); err != nil {
 		return true
 	}
-	return fovMap.cells[y][x].blocksMovement
+	return fovMap.cells[y][x].BlocksMovement
 }
 
 // SetBlocksMovement sets the blocksMovement property of the cell at x and y to blocks.
@@ -79,7 +79,7 @@ func (fovMap *MapBase) SetBlocksMovement(x, y int, blocks bool) error {
 	if err := fovMap.CheckBounds(x, y); err != nil {
 		return err
 	}
-	fovMap.cells[y][x].blocksMovement = blocks
+	fovMap.cells[y][x].BlocksMovement = blocks
 	return nil
 }
 
@@ -88,7 +88,7 @@ func (fovMap *MapBase) BlocksLight(x, y int) bool {
 	if err := fovMap.CheckBounds(x, y); err != nil {
 		return true
 	}
-	return fovMap.cells[y][x].blocksLight
+	return fovMap.cells[y][x].BlocksLight
 }
 
 // SetBlocksLight sets the blocksLight property of the cell at x and y to blocks.
@@ -96,7 +96,7 @@ func (fovMap *MapBase) SetBlocksLight(x, y int, blocks bool) error {
 	if err := fovMap.CheckBounds(x, y); err != nil {
 		return err
 	}
-	fovMap.cells[y][x].blocksLight = blocks
+	fovMap.cells[y][x].BlocksLight = blocks
 	return nil
 }
 
@@ -105,7 +105,7 @@ func (fovMap *MapBase) Seen(x, y int) bool {
 	if err := fovMap.CheckBounds(x, y); err != nil {
 		return false
 	}
-	return fovMap.cells[y][x].seen
+	return fovMap.cells[y][x].Seen
 }
 
 // SetSeen sets whether a given cell is considered as within the FoV.
@@ -113,7 +113,7 @@ func (fovMap *MapBase) SetSeen(x, y int, seen bool) error {
 	if err := fovMap.CheckBounds(x, y); err != nil {
 		return err
 	}
-	fovMap.cells[y][x].seen = seen
+	fovMap.cells[y][x].Seen = seen
 	return nil
 }
 
@@ -122,7 +122,7 @@ func (fovMap *MapBase) Lighting(x, y int) int8 {
 	if err := fovMap.CheckBounds(x, y); err != nil {
 		return 0
 	}
-	return fovMap.cells[y][x].lighting
+	return fovMap.cells[y][x].Lighting
 }
 
 // SetLighting sets a given cell's lighting value to the one provided.
@@ -130,7 +130,7 @@ func (fovMap *MapBase) SetLighting(x, y int, light int8) error {
 	if err := fovMap.CheckBounds(x, y); err != nil {
 		return err
 	}
-	fovMap.cells[y][x].lighting = light
+	fovMap.cells[y][x].Lighting = light
 	return nil
 }
 

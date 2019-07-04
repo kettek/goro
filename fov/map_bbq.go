@@ -88,13 +88,13 @@ func (fovMap *MapBBQ) computeLOS(x0, y0, x1, y1 int, maxRadius float64, light in
 			nextY += quadrantY
 		}
 	}
-	fovMap.cells[y1][x1].seen = true
+	fovMap.cells[y1][x1].Seen = true
 	// Do light calculations (?)
 	// It might be best if we make a separate light-only FoV calculation that aggregates multiple FoVs (from each light) and then concatenates their values together in a final FoV. But, for now, this works for a player-only system.
 	light *= int8(distance / maxRadius)
 	if light != 0 {
-		if fovMap.cells[y1][x1].lighting < light {
-			fovMap.cells[y1][x1].lighting += light
+		if fovMap.cells[y1][x1].Lighting < light {
+			fovMap.cells[y1][x1].Lighting += light
 		}
 	}
 

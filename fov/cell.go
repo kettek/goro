@@ -20,8 +20,8 @@ package fov
 
 // Cell is the state for a given position in an FoVMap.
 type Cell struct {
-	lighting       int8 // -127 to 0 for "deeper darkness", 0 to 127 for light levels.
-	seen           bool // Whether this cell is within the FoV.
-	blocksLight    bool
-	blocksMovement bool
+	Lighting       int8 // -127 to 0 for "deeper darkness", 0 to 127 for light levels.
+	Seen           bool // Whether this cell is within the FoV.
+	BlocksLight    bool
+	BlocksMovement bool
 }
