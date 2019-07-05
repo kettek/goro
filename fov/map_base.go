@@ -31,6 +31,8 @@ type MapBase struct {
 
 // Resize resizes the given MapBase to the provided size.
 func (fovMap *MapBase) Resize(width, height int) {
+	fovMap.width = width
+	fovMap.height = height
 	currHeight := len(fovMap.cells)
 	// Grow or shrink our height.
 	if currHeight < fovMap.height {
