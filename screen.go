@@ -112,11 +112,17 @@ func (screen *Screen) DrawRune(x int, y int, r rune, s Style) error {
 
 // DrawString draws a string at the position of x and y with a given style, iterating in the x direction as it goes.
 func (screen *Screen) DrawString(x int, y int, str string, s Style) error {
+	origX := x
 	for _, r := range str {
-		if err := screen.DrawRune(x, y, r, s); err != nil {
-			return err
+		if r == '\n' {
+			x = origX
+			y++
+		} else {
+			if err := screen.DrawRune(x, y, r, s); err != nil {
+				return err
+			}
+			x++
 		}
-		x++
 	}
 	return nil
 }
