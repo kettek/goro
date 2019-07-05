@@ -148,6 +148,15 @@ func (fovMap *MapBase) CheckBounds(x, y int) error {
 	return nil
 }
 
+// Reset resets the visibility state of all cells.
+func (fovMap *MapBase) Reset() {
+	for y := range fovMap.cells {
+		for x := range fovMap.cells[y] {
+			fovMap.cells[y][x].Visible = false
+		}
+	}
+}
+
 // ToString returns a stringified view of the map.
 func (fovMap *MapBase) ToString(showVisible, showBlocksLight, showBlocksMovement, showLight bool) string {
 	var str string

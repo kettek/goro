@@ -22,6 +22,8 @@ package fov
 type Map interface {
 	Resize(width, height int)
 	Clear(fovCell Cell)
+	Reset()
+	Recompute(cX, cY int, radius int, light Light)
 	Compute(cX, cY int, radius int, light Light)
 	SetCell(x, y int, fovCell Cell) error
 	BlocksMovement(x, y int) bool

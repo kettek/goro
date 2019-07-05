@@ -102,3 +102,9 @@ func (fovMap *MapBBQ) computeLOS(x0, y0, x1, y1 int, maxRadius float64, light Li
 	}
 
 }
+
+// Recompute calls Reset() then Compute()
+func (fovMap *MapBBQ) Recompute(cX, cY int, radius int, light Light) {
+	fovMap.Reset()
+	fovMap.Compute(cX, cY, radius, light)
+}
