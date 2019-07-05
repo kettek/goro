@@ -79,9 +79,9 @@ func (fovMap *MapBBQ) computeLOS(x0, y0, x1, y1 int, maxRadius float64, light Li
 			return
 		}
 
-		if math.Abs(float64(destY*(nextX-x0+quadrantX)-destX*(nextY-y0)))/distance < 0.5 {
+		if (math.Abs(float64(destY*(nextX-x0+quadrantX)-destX*(nextY-y0))) / distance) < 0.5 {
 			nextX += quadrantX
-		} else if math.Abs(float64(destY*(nextX-x0)-destX*(nextY-y0+quadrantY)))/distance < 0.5 {
+		} else if (math.Abs(float64(destY*(nextX-x0)-destX*(nextY-y0+quadrantY))) / distance) < 0.5 {
 			nextY += quadrantY
 		} else {
 			nextX += quadrantX
@@ -91,7 +91,7 @@ func (fovMap *MapBBQ) computeLOS(x0, y0, x1, y1 int, maxRadius float64, light Li
 	if fovMap.CheckBounds(x1, y1) != nil {
 		return
 	}
-	fovMap.cells[y1][x1].Seen = true
+	fovMap.cells[y1][x1].Visible = true
 	// Do light calculations (?)
 	// It might be best if we make a separate light-only FoV calculation that aggregates multiple FoVs (from each light) and then concatenates their values together in a final FoV. But, for now, this works for a player-only system.
 	lumens := light.Lumens * int16(distance/maxRadius)

@@ -28,8 +28,8 @@ type Map interface {
 	SetBlocksMovement(x, y int, blocks bool) error
 	BlocksLight(x, y int) bool
 	SetBlocksLight(x, y int, blocks bool) error
-	Seen(x, y int) bool
-	SetSeen(x, y int, seen bool) error
+	Visible(x, y int) bool
+	SetVisible(x, y int, visible bool) error
 	Lighting(x, y int) Light
 	SetLighting(x, y int, light Light) error
 	CheckBounds(x, y int) error

@@ -100,20 +100,20 @@ func (fovMap *MapBase) SetBlocksLight(x, y int, blocks bool) error {
 	return nil
 }
 
-// Seen returns whether a given cell is considered as within the FoV. Returns false if x or y is out of bounds.
-func (fovMap *MapBase) Seen(x, y int) bool {
+// Visible returns whether a given cell is considered as within the FoV. Returns false if x or y is out of bounds.
+func (fovMap *MapBase) Visible(x, y int) bool {
 	if err := fovMap.CheckBounds(x, y); err != nil {
 		return false
 	}
-	return fovMap.cells[y][x].Seen
+	return fovMap.cells[y][x].Visible
 }
 
-// SetSeen sets whether a given cell is considered as within the FoV.
-func (fovMap *MapBase) SetSeen(x, y int, seen bool) error {
+// SetVisible sets whether a given cell is considered as within the FoV.
+func (fovMap *MapBase) SetVisible(x, y int, visible bool) error {
 	if err := fovMap.CheckBounds(x, y); err != nil {
 		return err
 	}
-	fovMap.cells[y][x].Seen = seen
+	fovMap.cells[y][x].Visible = visible
 	return nil
 }
 

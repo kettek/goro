@@ -21,7 +21,7 @@ package fov
 // Cell is the state for a given position in an FoVMap.
 type Cell struct {
 	Lighting       Light
-	Seen           bool // Whether this cell is within the FoV.
+	Visible        bool // Whether this cell is within the FoV.
 	BlocksLight    bool
 	BlocksMovement bool
 }
