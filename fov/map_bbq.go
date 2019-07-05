@@ -35,7 +35,7 @@ func NewMapBBQ(width, height int) (fovMap *MapBBQ) {
 }
 
 // Compute calculates the FOV for our BBQ.
-func (fovMap *MapBBQ) Compute(cX, cY int, radius int, light int8) {
+func (fovMap *MapBBQ) Compute(cX, cY int, radius int, light Light) {
 	maxRadius := math.Sqrt(float64(radius*radius + radius*radius))
 	for i := -radius; i <= radius; i++ {
 		for j := -radius; j <= radius; j++ {
@@ -47,7 +47,7 @@ func (fovMap *MapBBQ) Compute(cX, cY int, radius int, light int8) {
 }
 
 // computeLOS checks the line of sight between x0,y0 to x1,y1, setting the cell at x1,y1 to
-func (fovMap *MapBBQ) computeLOS(x0, y0, x1, y1 int, maxRadius float64, light int8) {
+func (fovMap *MapBBQ) computeLOS(x0, y0, x1, y1 int, maxRadius float64, light Light) {
 	var quadrantX, quadrantY, nextX, nextY, destX, destY int
 	var distance float64
 
@@ -91,10 +91,10 @@ func (fovMap *MapBBQ) computeLOS(x0, y0, x1, y1 int, maxRadius float64, light in
 	fovMap.cells[y1][x1].Seen = true
 	// Do light calculations (?)
 	// It might be best if we make a separate light-only FoV calculation that aggregates multiple FoVs (from each light) and then concatenates their values together in a final FoV. But, for now, this works for a player-only system.
-	light *= int8(distance / maxRadius)
-	if light != 0 {
-		if fovMap.cells[y1][x1].Lighting < light {
-			fovMap.cells[y1][x1].Lighting += light
+	lumens := light.Lumens * int16(distance/maxRadius)
+	if lumens != 0 {
+		if fovMap.cells[y1][x1].Lighting.Lumens < lumens {
+			fovMap.cells[y1][x1].Lighting.Lumens += lumens
 		}
 	}
 

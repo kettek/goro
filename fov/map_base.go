@@ -118,15 +118,15 @@ func (fovMap *MapBase) SetSeen(x, y int, seen bool) error {
 }
 
 // Lighting returns the lighting value for a given cell. Returns 0 if x or y is out of bounds.
-func (fovMap *MapBase) Lighting(x, y int) int8 {
+func (fovMap *MapBase) Lighting(x, y int) Light {
 	if err := fovMap.CheckBounds(x, y); err != nil {
-		return 0
+		return Light{}
 	}
 	return fovMap.cells[y][x].Lighting
 }
 
 // SetLighting sets a given cell's lighting value to the one provided.
-func (fovMap *MapBase) SetLighting(x, y int, light int8) error {
+func (fovMap *MapBase) SetLighting(x, y int, light Light) error {
 	if err := fovMap.CheckBounds(x, y); err != nil {
 		return err
 	}

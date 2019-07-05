@@ -22,7 +22,7 @@ package fov
 type Map interface {
 	Resize(width, height int)
 	Clear(fovCell Cell)
-	Compute(cX, cY int, radius int, light int8)
+	Compute(cX, cY int, radius int, light Light)
 	SetCell(x, y int, fovCell Cell) error
 	BlocksMovement(x, y int) bool
 	SetBlocksMovement(x, y int, blocks bool) error
@@ -30,8 +30,8 @@ type Map interface {
 	SetBlocksLight(x, y int, blocks bool) error
 	Seen(x, y int) bool
 	SetSeen(x, y int, seen bool) error
-	Lighting(x, y int) int8
-	SetLighting(x, y int, light int8) error
+	Lighting(x, y int) Light
+	SetLighting(x, y int, light Light) error
 	CheckBounds(x, y int) error
 }
 

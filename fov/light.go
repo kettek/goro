@@ -18,10 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package fov
 
-// Cell is the state for a given position in an FoVMap.
-type Cell struct {
-	Lighting       Light
-	Seen           bool // Whether this cell is within the FoV.
-	BlocksLight    bool
-	BlocksMovement bool
+// Light represents light state.
+type Light struct {
+	Lumens int16
 }
