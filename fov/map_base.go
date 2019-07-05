@@ -20,6 +20,7 @@ package fov
 
 import (
 	"errors"
+	"strconv"
 )
 
 // MapBase is the base implementation of our Map interface. It is used as an embedded structure within most Map implementations.
@@ -143,4 +144,39 @@ func (fovMap *MapBase) CheckBounds(x, y int) error {
 		return errors.New("x out of range")
 	}
 	return nil
+}
+
+// ToString returns a stringified view of the map.
+func (fovMap *MapBase) ToString(showVisible, showBlocksLight, showBlocksMovement, showLight bool) string {
+	var str string
+	for y := range fovMap.cells {
+		for x := range fovMap.cells[y] {
+			if showVisible {
+				if fovMap.cells[y][x].Visible {
+					str += "v"
+				} else {
+					str += " "
+				}
+			}
+			if showBlocksLight {
+				if fovMap.cells[y][x].BlocksLight {
+					str += "B"
+				} else {
+					str += " "
+				}
+			}
+			if showBlocksMovement {
+				if fovMap.cells[y][x].BlocksMovement {
+					str += "b"
+				} else {
+					str += " "
+				}
+			}
+			if showLight {
+				str += strconv.Itoa(int(fovMap.cells[y][x].Lighting.Lumens))
+			}
+		}
+		str += "\n"
+	}
+	return str
 }

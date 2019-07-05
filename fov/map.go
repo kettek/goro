@@ -33,6 +33,7 @@ type Map interface {
 	Lighting(x, y int) Light
 	SetLighting(x, y int, light Light) error
 	CheckBounds(x, y int) error
+	ToString(showVisible, showBlocksLight, showBlocksMovement, showLight bool) string
 }
 
 type Algorithm uint8
