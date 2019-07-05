@@ -47,5 +47,5 @@ func StyleToTCellStyle(style Style) tcell.Style {
 
 // RGBAToTCellColor converts a color.RGBA to a tcell.Color type.
 func RGBAToTCellColor(color color.RGBA) tcell.Color {
-	return tcell.NewRGBColor(int32(color.R), int32(color.G), int32(color.B)) | tcell.ColorIsRGB
+	return tcell.NewRGBColor(int32(color.R), int32(color.G), int32(color.B))
 }
