@@ -18,6 +18,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package goro
 
+import (
+	"github.com/kettek/goro/glyphs"
+)
+
 // Backend is an interface through which a Screen is displayed and controlled.
 type Backend interface {
 	Init() error
@@ -30,4 +34,5 @@ type Backend interface {
 	Scale() float64
 	SetScale(float64)
 	SetTitle(string)
+	SetGlyphs(glyphs.ID, string, float64) error
 }

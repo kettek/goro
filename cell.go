@@ -18,6 +18,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package goro
 
+import (
+	"github.com/kettek/goro/glyphs"
+)
+
 // Cell abstractly represents a rune, style, and other data.
 type Cell struct {
 	Rune         rune
@@ -26,4 +30,5 @@ type Cell struct {
 	Dirty        bool
 	PendingRune  rune
 	PendingStyle Style
+	Glyphs       glyphs.ID
 }

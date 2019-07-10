@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import (
 	"github.com/gdamore/tcell"
+	"github.com/kettek/goro/glyphs"
 )
 
 // BackendTCell is the backend for the tcell library.
@@ -321,4 +322,9 @@ var shiftMap = map[rune]bool{
 	'X': true,
 	'Y': true,
 	'Z': true,
+}
+
+// SetGlyphs does nothing!
+func (backend *BackendTCell) SetGlyphs(id glyphs.ID, path string, size float64) error {
+	return nil
 }

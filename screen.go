@@ -20,6 +20,8 @@ package goro
 
 import (
 	"errors"
+
+	"github.com/kettek/goro/glyphs"
 )
 
 // Screen is a virtual Rows x Columns buffer used for drawing runes to.
@@ -167,6 +169,16 @@ func (screen *Screen) SetRune(x int, y int, r rune) error {
 	return nil
 }
 
+// SetGlyphsID sets the glyphs at a given location.
+func (screen *Screen) SetGlyphsID(x int, y int, id glyphs.ID) error {
+	if err := screen.checkBounds(x, y); err != nil {
+		return err
+	}
+	screen.cells[y][x].Glyphs = id
+	screen.cells[y][x].Redraw = true
+	return nil
+}
+
 // Clear clears the underlying screen.
 func (screen *Screen) Clear() {
 	for y := 0; y < len(screen.cells); y++ {
@@ -192,6 +204,16 @@ func (screen *Screen) Flush() {
 	screen.Redraw = true
 	// hmm. We're calling this here so we can force render the view.
 	globalBackend.Refresh()
+}
+
+// ForceRedraw marks each cell of the screen to be redrawn.
+func (screen *Screen) ForceRedraw() {
+	for y := 0; y < len(screen.cells); y++ {
+		for x := 0; x < len(screen.cells[y]); x++ {
+			screen.cells[y][x].Redraw = true
+		}
+	}
+	screen.Redraw = true
 }
 
 // Size returns the current screen columns by rows.
@@ -229,4 +251,9 @@ func (screen *Screen) SetScale(scale float64) {
 // SetTitle sets the backend window's title to title.
 func (screen *Screen) SetTitle(title string) {
 	globalBackend.SetTitle(title)
+}
+
+// SetGlyphs sets the screen backend's window to use the provided font. Only available for graphical backends.
+func (screen *Screen) SetGlyphs(id glyphs.ID, path string, size float64) error {
+	return globalBackend.SetGlyphs(id, path, size)
 }

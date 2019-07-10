@@ -22,8 +22,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import (
 	"fmt"
+	"path"
+	"strings"
 
 	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/text"
+	"github.com/kettek/goro/glyphs"
 )
 
 // BackendEbiten is our Ebiten backend.
@@ -32,6 +36,7 @@ type BackendEbiten struct {
 	imageBuffer   *ebiten.Image
 	width, height int
 	hasStarted    bool
+	glyphs        []glyphs.Glyphs
 
 	pressedKeys  []bool
 	pressedMouse []bool
@@ -109,9 +114,20 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 		if backend.screen.Redraw && !ebiten.IsDrawingSkipped() {
 			for y := 0; y < len(backend.screen.cells); y++ {
 				for x := 0; x < len(backend.screen.cells[y]); x++ {
-					if backend.screen.cells[y][x].Dirty {
-						// text.Draw(backend.screen, backend.screen.cells[y][x].Rune, backend.screen.Font, x*backend.screen.FontWidth(), y*backend.screen.FontHeight(), StyleToEbitenStyle(backend.screen.cells[y][x].Style))
-						backend.screen.cells[y][x].Dirty = false
+					if backend.screen.cells[y][x].Redraw {
+						glyphSet := backend.glyphs[backend.screen.cells[y][x].Glyphs]
+						switch glyphSet := glyphSet.(type) {
+						case *glyphs.Truetype:
+							text.Draw(
+								imageBuffer,
+								string(backend.screen.cells[y][x].Rune),
+								glyphSet.Normal,
+								x*glyphSet.Width(),
+								y*glyphSet.Height(),
+								backend.screen.cells[y][x].Style.Foreground,
+							)
+						}
+						backend.screen.cells[y][x].Redraw = false
 					}
 				}
 			}
@@ -153,4 +169,32 @@ func (backend *BackendEbiten) SetScale(scale float64) {
 // SetTitle sets the backend window's title.
 func (backend *BackendEbiten) SetTitle(title string) {
 	ebiten.SetWindowTitle(title)
+}
+
+// SetGlyphs sets the glyphs to be used for rendering.
+func (backend *BackendEbiten) SetGlyphs(id glyphs.ID, filePath string, size float64) error {
+	ext := strings.ToLower(path.Ext(filePath))
+	switch ext {
+	case ".ttf":
+		{
+			ttfGlyphs, err := glyphs.LoadTruetype(filePath)
+			if err != nil {
+				return err
+			}
+			ttfGlyphs.SetSize(size)
+			backend.glyphs[id] = ttfGlyphs
+		}
+	default:
+		return nil
+	}
+
+	c, r := backend.screen.Size()
+	newWidth := c * backend.glyphs[id].Width()
+	newHeight := r * backend.glyphs[id].Height()
+
+	backend.SetSize(newWidth, newHeight)
+
+	backend.screen.ForceRedraw()
+	backend.Refresh()
+	return nil
 }
