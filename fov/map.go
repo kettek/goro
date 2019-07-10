@@ -38,13 +38,16 @@ type Map interface {
 	ToString(showVisible, showBlocksLight, showBlocksMovement, showLight bool) string
 }
 
+// Algorithm represents a field-of-view algorithm
 type Algorithm uint8
 
+// Our default algorithms
 const (
 	AlgorithmNone Algorithm = iota
 	AlgorithmBBQ
 )
 
+// NewMap returns a new Map at the given dimensions using the provided Algorithm.
 func NewMap(width, height int, algo Algorithm) Map {
 	switch algo {
 	default:
@@ -54,5 +57,4 @@ func NewMap(width, height int, algo Algorithm) Map {
 	case AlgorithmBBQ:
 		return NewMapBBQ(width, height)
 	}
-	return nil
 }

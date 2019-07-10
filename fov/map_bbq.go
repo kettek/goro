@@ -22,7 +22,7 @@ import (
 	"math"
 )
 
-// Map represents a 2D structure for calculating a field of view.
+// MapBBQ represents a 2D structure for calculating a field of view.
 type MapBBQ struct {
 	MapBase
 }
