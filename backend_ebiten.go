@@ -228,7 +228,7 @@ func (backend *BackendEbiten) DrawCell(image *ebiten.Image, x, y int) {
 				backend.imageBuffer,
 				string(backend.screen.cells[y][x].Rune),
 				glyphSet.Normal,
-				x*glyphSet.Width()+bounds.Min.X.Round()/2,
+				x*glyphSet.Width()+bounds.Max.X.Round()/2,
 				y*glyphSet.Height()+glyphSet.Ascent(),
 				fg,
 			)
