@@ -9,10 +9,10 @@ import (
 
 // Truetype is our Truetype data.
 type Truetype struct {
-	truetype      *truetype.Font
-	size          float64
-	width, height int
-	Normal        font.Face
+	truetype              *truetype.Font
+	size                  float64
+	width, height, ascent int
+	Normal                font.Face
 	// How do we manage bold? italics? etc?
 	// bold font.Face
 	// italics font.Face
@@ -64,6 +64,11 @@ func (f *Truetype) Height() int {
 	return f.height
 }
 
+// Ascent returns the ascent of the font.
+func (f *Truetype) Ascent() int {
+	return f.ascent
+}
+
 // rebuild rebuilds all the font variants.
 func (f *Truetype) rebuild() {
 	f.Normal = truetype.NewFace(f.truetype, &truetype.Options{
@@ -80,4 +85,6 @@ func (f *Truetype) rebuild() {
 		f.width = f.height / 2 // This is not good.
 	}
 	f.width = advance.Round()
+
+	f.ascent = metrics.Ascent.Round()
 }

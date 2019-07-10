@@ -15,4 +15,5 @@ type Glyphs interface {
 	SetSize(float64)
 	Width() int
 	Height() int
+	Ascent() int
 }
