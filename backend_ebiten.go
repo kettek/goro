@@ -53,6 +53,8 @@ func (backend *BackendEbiten) Init() error {
 	backend.pressedKeys = make([]bool, ebiten.KeyMax+1)
 	backend.pressedMouse = make([]bool, ebiten.MouseButtonMiddle+1)
 
+	backend.glyphs = make([]glyphs.Glyphs, 10)
+
 	if err := backend.screen.Init(); err != nil {
 		return err
 	}
