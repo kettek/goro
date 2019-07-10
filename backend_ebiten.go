@@ -204,9 +204,17 @@ func (backend *BackendEbiten) SetGlyphs(id glyphs.ID, filePath string, size floa
 }
 
 func (backend *BackendEbiten) DrawCell(image *ebiten.Image, x, y int) {
+	fg := backend.screen.cells[y][x].Style.Foreground
+	if fg == ColorNone {
+		fg = backend.screen.Foreground
+	}
+	bg := backend.screen.cells[y][x].Style.Background
+	if bg == ColorNone {
+		bg = backend.screen.Background
+	}
 	// Draw our background
 	id := backend.screen.cells[y][x].Glyphs
-	backend.emptyCell.Fill(backend.screen.cells[y][x].Style.Background)
+	backend.emptyCell.Fill(bg)
 	backend.op.GeoM.Reset()
 	backend.op.GeoM.Translate(float64(x*backend.glyphs[id].Width()), float64(y*backend.glyphs[id].Height()))
 	image.DrawImage(backend.emptyCell, backend.op)
@@ -220,7 +228,7 @@ func (backend *BackendEbiten) DrawCell(image *ebiten.Image, x, y int) {
 			glyphSet.Normal,
 			x*glyphSet.Width(),
 			y*glyphSet.Height()+glyphSet.Ascent(),
-			backend.screen.cells[y][x].Style.Foreground,
+			fg,
 		)
 	}
 }

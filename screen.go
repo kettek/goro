@@ -34,6 +34,8 @@ type Screen struct {
 	UseKeys          bool
 	UseMouse         bool
 	AutoSize         bool
+	Foreground       Color
+	Background       Color
 	Redraw           bool
 }
 
@@ -214,6 +216,18 @@ func (screen *Screen) ForceRedraw() {
 		}
 	}
 	screen.Redraw = true
+}
+
+// SetDefaultForeground sets the default foreground color to use.
+func (screen *Screen) SetDefaultForeground(c Color) {
+	screen.Foreground = c
+	screen.ForceRedraw()
+}
+
+// SetDefaultBackground sets the default background color to use.
+func (screen *Screen) SetDefaultBackground(c Color) {
+	screen.Background = c
+	screen.ForceRedraw()
 }
 
 // Size returns the current screen columns by rows.
