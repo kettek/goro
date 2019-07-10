@@ -34,6 +34,7 @@ import (
 type BackendEbiten struct {
 	screen        Screen
 	imageBuffer   *ebiten.Image
+	op            *ebiten.DrawImageOptions
 	width, height int
 	hasStarted    bool
 	glyphs        []glyphs.Glyphs
@@ -53,6 +54,8 @@ func InitEbiten() error {
 func (backend *BackendEbiten) Init() error {
 	backend.pressedKeys = make([]bool, ebiten.KeyMax+1)
 	backend.pressedMouse = make([]bool, ebiten.MouseButtonMiddle+1)
+
+	backend.op = &ebiten.DrawImageOptions{}
 
 	backend.glyphs = make([]glyphs.Glyphs, 10)
 	backend.emptyCell, _ = ebiten.NewImage(16, 16, ebiten.FilterDefault)
@@ -122,12 +125,7 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 					//if backend.screen.cells[y][x].Redraw {
 					glyphSet := backend.glyphs[backend.screen.cells[y][x].Glyphs]
 					// Draw background
-					backend.DrawRect(
-						imageBuffer,
-						float32(x), float32(y),
-						float32(x)+float32(x*glyphSet.Width()), float32(y)+float32(y*glyphSet.Height()),
-						backend.screen.cells[y][x].Style.Background,
-					)
+					backend.DrawCell(imageBuffer, x, y)
 					switch glyphSet := glyphSet.(type) {
 					case *glyphs.Truetype:
 						text.Draw(
@@ -214,6 +212,13 @@ func (backend *BackendEbiten) SetGlyphs(id glyphs.ID, filePath string, size floa
 	return nil
 }
 
+func (backend *BackendEbiten) DrawCell(image *ebiten.Image, x, y int) {
+	backend.emptyCell.Fill(backend.screen.cells[y][x].Style.Background)
+	backend.op.GeoM.Reset()
+	backend.op.GeoM.Translate(float64(x), float64(y))
+	image.DrawImage(backend.emptyCell, backend.op)
+}
+
 func (backend *BackendEbiten) DrawRect(image *ebiten.Image, x0, y0, x1, y1 float32, c Color) {
 	r := float32(c.R) / 0xff
 	g := float32(c.G) / 0xff
@@ -242,9 +247,9 @@ func (backend *BackendEbiten) DrawRect(image *ebiten.Image, x0, y0, x1, y1 float
 			ColorR: r, ColorG: g, ColorB: b, ColorA: a,
 		},
 	}
-	triangles := []uint16{0, 1, 2, 1, 2, 3}
+	indices := []uint16{0, 1, 2, 1, 2, 3}
 
-	image.DrawTriangles(vertices, triangles, backend.emptyCell, nil)
+	image.DrawTriangles(vertices, indices, backend.emptyCell, nil)
 }
 
 func (backend *BackendEbiten) ebitenKeyToEventKey(k ebiten.Key) (eventKey EventKey) {
