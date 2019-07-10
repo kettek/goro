@@ -125,7 +125,7 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 					backend.DrawRect(
 						imageBuffer,
 						float32(x), float32(y),
-						float32(x*glyphSet.Width()), float32(y*glyphSet.Height()),
+						float32(x)+float32(x*glyphSet.Width()), float32(y)+float32(y*glyphSet.Height()),
 						backend.screen.cells[y][x].Style.Background,
 					)
 					switch glyphSet := glyphSet.(type) {
