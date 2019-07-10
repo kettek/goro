@@ -219,17 +219,19 @@ func (backend *BackendEbiten) DrawCell(image *ebiten.Image, x, y int) {
 	backend.op.GeoM.Translate(float64(x*backend.glyphs[id].Width()), float64(y*backend.glyphs[id].Height()))
 	image.DrawImage(backend.emptyCell, backend.op)
 	// Draw our rune
-	glyphSet := backend.glyphs[backend.screen.cells[y][x].Glyphs]
-	switch glyphSet := glyphSet.(type) {
-	case *glyphs.Truetype:
-		text.Draw(
-			backend.imageBuffer,
-			string(backend.screen.cells[y][x].Rune),
-			glyphSet.Normal,
-			x*glyphSet.Width(),
-			y*glyphSet.Height()+glyphSet.Ascent(),
-			fg,
-		)
+	if backend.screen.cells[y][x].Rune != rune(0) {
+		glyphSet := backend.glyphs[backend.screen.cells[y][x].Glyphs]
+		switch glyphSet := glyphSet.(type) {
+		case *glyphs.Truetype:
+			text.Draw(
+				backend.imageBuffer,
+				string(backend.screen.cells[y][x].Rune),
+				glyphSet.Normal,
+				x*glyphSet.Width(),
+				y*glyphSet.Height()+glyphSet.Ascent(),
+				fg,
+			)
+		}
 	}
 }
 
