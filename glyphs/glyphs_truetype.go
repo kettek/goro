@@ -83,8 +83,9 @@ func (f *Truetype) rebuild() {
 	advance, ok := f.Normal.GlyphAdvance('M')
 	if !ok {
 		f.width = f.height / 2 // This is not good.
+	} else {
+		f.width = advance.Round()
 	}
-	f.width = advance.Round()
 
 	f.ascent = metrics.Ascent.Round()
 }
