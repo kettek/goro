@@ -213,9 +213,10 @@ func (backend *BackendEbiten) SetGlyphs(id glyphs.ID, filePath string, size floa
 }
 
 func (backend *BackendEbiten) DrawCell(image *ebiten.Image, x, y int) {
+	id := backend.screen.cells[y][x].Glyphs
 	backend.emptyCell.Fill(backend.screen.cells[y][x].Style.Background)
 	backend.op.GeoM.Reset()
-	backend.op.GeoM.Translate(float64(x), float64(y))
+	backend.op.GeoM.Translate(float64(x*backend.glyphs[id].Width()), float64(y*backend.glyphs[id].Height()))
 	image.DrawImage(backend.emptyCell, backend.op)
 }
 
