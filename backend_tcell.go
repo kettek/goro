@@ -179,14 +179,14 @@ func (backend *BackendTCell) tCellKeyToKey(tcellKey tcell.Key, tcellRune rune) (
 		}
 	} else {
 		var ok bool
-		if key, ok = keyMap[tcellKey]; !ok {
+		if key, ok = tCellKeyMap[tcellKey]; !ok {
 			return KeyNull
 		}
 	}
 	return key
 }
 
-var keyMap = map[tcell.Key]Key{
+var tCellKeyMap = map[tcell.Key]Key{
 	tcell.KeyF1:     KeyF1,
 	tcell.KeyF2:     KeyF2,
 	tcell.KeyF3:     KeyF3,

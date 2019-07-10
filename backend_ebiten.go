@@ -94,7 +94,7 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 				if !backend.pressedKeys[k] {
 					fmt.Printf("Sending %d.\n", int16(k))
 					if backend.screen.UseKeys {
-						backend.screen.eventChan <- Event(EventKey{Key: Key(k), Rune: rune(k)})
+						backend.screen.eventChan <- Event(backend.ebitenKeyToEventKey(k))
 					}
 				}
 				backend.pressedKeys[k] = true
@@ -245,4 +245,48 @@ func (backend *BackendEbiten) DrawRect(image *ebiten.Image, x0, y0, x1, y1 float
 	triangles := []uint16{0, 1, 2, 1, 2, 3}
 
 	image.DrawTriangles(vertices, triangles, backend.emptyCell, nil)
+}
+
+func (backend *BackendEbiten) ebitenKeyToEventKey(k ebiten.Key) (eventKey EventKey) {
+	var key Key
+	var ok bool
+	if key, ok = ebitenKeyMap[k]; !ok {
+		key = KeyNull
+	}
+
+	eventKey.Key = key
+	eventKey.Rune = rune(key) // FIXME
+
+	if backend.pressedKeys[ebiten.KeyShift] {
+		eventKey.Shift = true
+	}
+	if backend.pressedKeys[ebiten.KeyControl] {
+		eventKey.Ctrl = true
+	}
+	if backend.pressedKeys[ebiten.KeyAlt] {
+		eventKey.Alt = true
+	}
+	// TODO: Meta?
+
+	return
+}
+
+var ebitenKeyMap = map[ebiten.Key]Key{
+	ebiten.KeyF1:     KeyF1,
+	ebiten.KeyF2:     KeyF2,
+	ebiten.KeyF3:     KeyF3,
+	ebiten.KeyF4:     KeyF4,
+	ebiten.KeyF5:     KeyF5,
+	ebiten.KeyF6:     KeyF6,
+	ebiten.KeyF7:     KeyF7,
+	ebiten.KeyF8:     KeyF8,
+	ebiten.KeyF9:     KeyF9,
+	ebiten.KeyF10:    KeyF10,
+	ebiten.KeyF11:    KeyF11,
+	ebiten.KeyF12:    KeyF12,
+	ebiten.KeyLeft:   KeyLeft,
+	ebiten.KeyRight:  KeyRight,
+	ebiten.KeyUp:     KeyUp,
+	ebiten.KeyDown:   KeyDown,
+	ebiten.KeyEscape: KeyEscape,
 }
