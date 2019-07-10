@@ -49,10 +49,9 @@ func (f *Truetype) SetSize(size float64) {
 	if f.size == size {
 		return
 	}
+	f.size = size
 
 	f.rebuild()
-
-	f.size = size
 }
 
 // Width gets the width of the font.
