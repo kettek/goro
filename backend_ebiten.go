@@ -123,7 +123,7 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 			for y := 0; y < len(backend.screen.cells); y++ {
 				for x := 0; x < len(backend.screen.cells[y]); x++ {
 					if backend.screen.cells[y][x].Redraw {
-						backend.DrawCell(backend.imageBuffer, x, y)
+						backend.DrawCell(x, y)
 						backend.screen.cells[y][x].Redraw = false
 					}
 				}
@@ -203,7 +203,7 @@ func (backend *BackendEbiten) SetGlyphs(id glyphs.ID, filePath string, size floa
 	return nil
 }
 
-func (backend *BackendEbiten) DrawCell(image *ebiten.Image, x, y int) {
+func (backend *BackendEbiten) DrawCell(x, y int) {
 	fg := backend.screen.cells[y][x].Style.Foreground
 	if fg == ColorNone {
 		fg = backend.screen.Foreground
@@ -217,7 +217,7 @@ func (backend *BackendEbiten) DrawCell(image *ebiten.Image, x, y int) {
 	backend.emptyCell.Fill(bg)
 	backend.op.GeoM.Reset()
 	backend.op.GeoM.Translate(float64(x*backend.glyphs[id].Width()), float64(y*backend.glyphs[id].Height()))
-	image.DrawImage(backend.emptyCell, backend.op)
+	backend.imageBuffer.DrawImage(backend.emptyCell, backend.op)
 	// Draw our rune
 	if backend.screen.cells[y][x].Rune != rune(0) {
 		glyphSet := backend.glyphs[backend.screen.cells[y][x].Glyphs]
