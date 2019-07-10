@@ -55,6 +55,7 @@ func (backend *BackendEbiten) Init() error {
 	backend.pressedKeys = make([]bool, ebiten.KeyMax+1)
 	backend.pressedMouse = make([]bool, ebiten.MouseButtonMiddle+1)
 
+	backend.imageBuffer, _ = ebiten.NewImage(320, 240, ebiten.FilterDefault)
 	backend.op = &ebiten.DrawImageOptions{}
 
 	backend.glyphs = make([]glyphs.Glyphs, 10)
@@ -83,7 +84,7 @@ func (backend *BackendEbiten) Refresh() {
 
 // Run runs the given function cb as a goroutine.
 func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
-	err = ebiten.Run(func(imageBuffer *ebiten.Image) (err error) {
+	err = ebiten.Run(func(screenBuffer *ebiten.Image) (err error) {
 		if !backend.hasStarted {
 			go func() {
 				cb(&backend.screen)
@@ -125,11 +126,11 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 					//if backend.screen.cells[y][x].Redraw {
 					glyphSet := backend.glyphs[backend.screen.cells[y][x].Glyphs]
 					// Draw background
-					backend.DrawCell(imageBuffer, x, y)
+					backend.DrawCell(backend.imageBuffer, x, y)
 					switch glyphSet := glyphSet.(type) {
 					case *glyphs.Truetype:
 						text.Draw(
-							imageBuffer,
+							backend.imageBuffer,
 							string(backend.screen.cells[y][x].Rune),
 							glyphSet.Normal,
 							x*glyphSet.Width(),
@@ -143,6 +144,9 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 			}
 			backend.screen.Redraw = false
 		}
+
+		backend.op.GeoM.Reset()
+		screenBuffer.DrawImage(backend.imageBuffer, backend.op)
 
 		return nil
 	}, backend.width, backend.height, 1, "GoingRogue - Ebiten")
@@ -206,6 +210,7 @@ func (backend *BackendEbiten) SetGlyphs(id glyphs.ID, filePath string, size floa
 
 	// Is this needed?
 	backend.emptyCell, _ = ebiten.NewImage(backend.glyphs[id].Width(), backend.glyphs[id].Height(), ebiten.FilterDefault)
+	backend.imageBuffer, _ = ebiten.NewImage(newWidth, newHeight, ebiten.FilterDefault)
 
 	backend.screen.ForceRedraw()
 	backend.Refresh()
