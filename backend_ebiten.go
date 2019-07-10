@@ -119,27 +119,26 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 		}
 
 		// Draw
-		if !ebiten.IsDrawingSkipped() {
-			//if backend.screen.Redraw && !ebiten.IsDrawingSkipped() {
+		if backend.screen.Redraw && !ebiten.IsDrawingSkipped() {
 			for y := 0; y < len(backend.screen.cells); y++ {
 				for x := 0; x < len(backend.screen.cells[y]); x++ {
-					//if backend.screen.cells[y][x].Redraw {
-					glyphSet := backend.glyphs[backend.screen.cells[y][x].Glyphs]
-					// Draw background
-					backend.DrawCell(backend.imageBuffer, x, y)
-					switch glyphSet := glyphSet.(type) {
-					case *glyphs.Truetype:
-						text.Draw(
-							backend.imageBuffer,
-							string(backend.screen.cells[y][x].Rune),
-							glyphSet.Normal,
-							x*glyphSet.Width(),
-							y*glyphSet.Height(),
-							backend.screen.cells[y][x].Style.Foreground,
-						)
+					if backend.screen.cells[y][x].Redraw {
+						glyphSet := backend.glyphs[backend.screen.cells[y][x].Glyphs]
+						// Draw background
+						backend.DrawCell(backend.imageBuffer, x, y)
+						switch glyphSet := glyphSet.(type) {
+						case *glyphs.Truetype:
+							text.Draw(
+								backend.imageBuffer,
+								string(backend.screen.cells[y][x].Rune),
+								glyphSet.Normal,
+								x*glyphSet.Width(),
+								y*glyphSet.Height(),
+								backend.screen.cells[y][x].Style.Foreground,
+							)
+						}
+						backend.screen.cells[y][x].Redraw = false
 					}
-					backend.screen.cells[y][x].Redraw = false
-					//}
 				}
 			}
 			backend.screen.Redraw = false
