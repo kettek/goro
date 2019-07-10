@@ -223,12 +223,12 @@ func (backend *BackendEbiten) DrawCell(image *ebiten.Image, x, y int) {
 		glyphSet := backend.glyphs[backend.screen.cells[y][x].Glyphs]
 		switch glyphSet := glyphSet.(type) {
 		case *glyphs.Truetype:
-			bounds, _, _ := glyphSet.Normal.GlyphBounds(backend.screen.cells[y][x].Rune)
+			bounds, advance, _ := glyphSet.Normal.GlyphBounds(backend.screen.cells[y][x].Rune)
 			text.Draw(
 				backend.imageBuffer,
 				string(backend.screen.cells[y][x].Rune),
 				glyphSet.Normal,
-				x*glyphSet.Width()+bounds.Max.X.Round()/2,
+				x*glyphSet.Width()+bounds.Max.X.Round()/2-advance.Round(),
 				y*glyphSet.Height()+glyphSet.Ascent(),
 				fg,
 			)
