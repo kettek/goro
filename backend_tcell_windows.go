@@ -1,6 +1,7 @@
-// +build windows,!disableTCell
+// +build windows,!cgo,!disableTCell
 
 package goro
+
 /*
 This file is a part of goRo, a library for writing roguelikes.
 Copyright (C) 2019 Ketchetwahmeegwun T. Southall
