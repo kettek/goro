@@ -37,6 +37,7 @@ type BackendEbiten struct {
 	width, height int
 	hasStarted    bool
 	glyphs        []glyphs.Glyphs
+	emptyCell     *ebiten.Image
 
 	pressedKeys  []bool
 	pressedMouse []bool
@@ -54,6 +55,7 @@ func (backend *BackendEbiten) Init() error {
 	backend.pressedMouse = make([]bool, ebiten.MouseButtonMiddle+1)
 
 	backend.glyphs = make([]glyphs.Glyphs, 10)
+	backend.emptyCell, _ = ebiten.NewImage(16, 16, ebiten.FilterDefault)
 
 	if err := backend.screen.Init(); err != nil {
 		return err
@@ -119,6 +121,13 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 				for x := 0; x < len(backend.screen.cells[y]); x++ {
 					//if backend.screen.cells[y][x].Redraw {
 					glyphSet := backend.glyphs[backend.screen.cells[y][x].Glyphs]
+					// Draw background
+					backend.DrawRect(
+						imageBuffer,
+						float32(x), float32(y),
+						float32(x*glyphSet.Width()), float32(y*glyphSet.Height()),
+						backend.screen.cells[y][x].Style.Background,
+					)
 					switch glyphSet := glyphSet.(type) {
 					case *glyphs.Truetype:
 						text.Draw(
@@ -197,7 +206,43 @@ func (backend *BackendEbiten) SetGlyphs(id glyphs.ID, filePath string, size floa
 
 	backend.SetSize(newWidth, newHeight)
 
+	// Is this needed?
+	backend.emptyCell, _ = ebiten.NewImage(backend.glyphs[id].Width(), backend.glyphs[id].Height(), ebiten.FilterDefault)
+
 	backend.screen.ForceRedraw()
 	backend.Refresh()
 	return nil
+}
+
+func (backend *BackendEbiten) DrawRect(image *ebiten.Image, x0, y0, x1, y1 float32, c Color) {
+	r := float32(c.R) / 0xff
+	g := float32(c.G) / 0xff
+	b := float32(c.B) / 0xff
+	a := float32(c.A) / 0xff
+
+	vertices := []ebiten.Vertex{
+		{
+			DstX: x0, DstY: y0,
+			SrcX: 1, SrcY: 1,
+			ColorR: r, ColorG: g, ColorB: b, ColorA: a,
+		},
+		{
+			DstX: x1, DstY: y0,
+			SrcX: 1, SrcY: 1,
+			ColorR: r, ColorG: g, ColorB: b, ColorA: a,
+		},
+		{
+			DstX: x0, DstY: y1,
+			SrcX: 1, SrcY: 1,
+			ColorR: r, ColorG: g, ColorB: b, ColorA: a,
+		},
+		{
+			DstX: x1, DstY: y1,
+			SrcX: 1, SrcY: 1,
+			ColorR: r, ColorG: g, ColorB: b, ColorA: a,
+		},
+	}
+	triangles := []uint16{0, 1, 2, 1, 2, 3}
+
+	image.DrawTriangles(vertices, triangles, backend.emptyCell, nil)
 }
