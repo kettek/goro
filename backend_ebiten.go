@@ -28,6 +28,7 @@ import (
 	"github.com/hajimehoshi/ebiten"
 	"github.com/hajimehoshi/ebiten/text"
 	"github.com/kettek/goro/glyphs"
+	"github.com/kettek/goro/resources"
 )
 
 // BackendEbiten is our Ebiten backend.
@@ -60,6 +61,9 @@ func (backend *BackendEbiten) Init() error {
 
 	backend.glyphs = make([]glyphs.Glyphs, 10)
 	backend.emptyCell, _ = ebiten.NewImage(16, 16, ebiten.FilterDefault)
+
+	// Load our built-in glyphs
+	backend.SetGlyphsFromTTFBytes(0, resources.GoroTTF, 16)
 
 	if err := backend.screen.Init(); err != nil {
 		return err
@@ -187,7 +191,24 @@ func (backend *BackendEbiten) SetGlyphs(id glyphs.ID, filePath string, size floa
 	default:
 		return nil
 	}
+	backend.syncGlyphs(id)
+	return nil
+}
 
+// SetGlyphsFromBytes sets the glyphs to be used for rendering from the provided TTF bytes.
+func (backend *BackendEbiten) SetGlyphsFromTTFBytes(id glyphs.ID, bytes []byte, size float64) error {
+	ttfGlyphs, err := glyphs.LoadTruetypeFromBytes(bytes)
+	if err != nil {
+		return err
+	}
+	ttfGlyphs.SetSize(size)
+	backend.glyphs[id] = ttfGlyphs
+	backend.syncGlyphs(id)
+	return nil
+}
+
+// syncGlyphs synchronizes the screen's size and backend size, along with associated cached variables, to use the updated glyphs.
+func (backend *BackendEbiten) syncGlyphs(id glyphs.ID) {
 	c, r := backend.screen.Size()
 	newWidth := c * backend.glyphs[id].Width()
 	newHeight := r * backend.glyphs[id].Height()
@@ -200,9 +221,9 @@ func (backend *BackendEbiten) SetGlyphs(id glyphs.ID, filePath string, size floa
 
 	backend.screen.ForceRedraw()
 	backend.Refresh()
-	return nil
 }
 
+// DrawCell draws the cell at x and y. This includes foreground character and background color.
 func (backend *BackendEbiten) DrawCell(x, y int) {
 	fg := backend.screen.cells[y][x].Style.Foreground
 	if fg == ColorNone {
