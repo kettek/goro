@@ -71,9 +71,6 @@ func (backend *BackendEbiten) Init() error {
 	backend.width = 320
 	backend.height = 240
 
-	// Load our built-in glyphs
-	backend.SetGlyphsFromTTFBytes(0, resources.GoroTTF, 16)
-
 	return nil
 }
 
@@ -90,6 +87,9 @@ func (backend *BackendEbiten) Refresh() {
 func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 	err = ebiten.Run(func(screenBuffer *ebiten.Image) (err error) {
 		if !backend.hasStarted {
+			// Load our built-in glyphs
+			backend.SetGlyphsFromTTFBytes(0, resources.GoroTTF, 16)
+
 			go func() {
 				cb(&backend.screen)
 			}()
