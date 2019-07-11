@@ -62,9 +62,6 @@ func (backend *BackendEbiten) Init() error {
 	backend.glyphs = make([]glyphs.Glyphs, 10)
 	backend.emptyCell, _ = ebiten.NewImage(16, 16, ebiten.FilterDefault)
 
-	// Load our built-in glyphs
-	backend.SetGlyphsFromTTFBytes(0, resources.GoroTTF, 16)
-
 	if err := backend.screen.Init(); err != nil {
 		return err
 	}
@@ -73,6 +70,9 @@ func (backend *BackendEbiten) Init() error {
 
 	backend.width = 320
 	backend.height = 240
+
+	// Load our built-in glyphs
+	backend.SetGlyphsFromTTFBytes(0, resources.GoroTTF, 16)
 
 	return nil
 }
