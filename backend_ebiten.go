@@ -123,20 +123,22 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 		}
 
 		// Draw
-		if backend.screen.Redraw && !ebiten.IsDrawingSkipped() {
-			for y := 0; y < len(backend.screen.cells); y++ {
-				for x := 0; x < len(backend.screen.cells[y]); x++ {
-					if backend.screen.cells[y][x].Redraw {
-						backend.DrawCell(x, y)
-						backend.screen.cells[y][x].Redraw = false
+		if !ebiten.IsDrawingSkipped() {
+			if backend.screen.Redraw {
+				for y := 0; y < len(backend.screen.cells); y++ {
+					for x := 0; x < len(backend.screen.cells[y]); x++ {
+						if backend.screen.cells[y][x].Redraw {
+							backend.DrawCell(x, y)
+							backend.screen.cells[y][x].Redraw = false
+						}
 					}
 				}
+				backend.screen.Redraw = false
 			}
-			backend.screen.Redraw = false
-		}
 
-		backend.op.GeoM.Reset()
-		screenBuffer.DrawImage(backend.imageBuffer, backend.op)
+			backend.op.GeoM.Reset()
+			screenBuffer.DrawImage(backend.imageBuffer, backend.op)
+		}
 
 		return nil
 	}, backend.width, backend.height, 1, "GoingRogue - Ebiten")
