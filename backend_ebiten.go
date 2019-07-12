@@ -124,11 +124,11 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 
 		// Draw
 		if !ebiten.IsDrawingSkipped() {
-			//if backend.screen.Redraw {
-			backend.drawCellBackgrounds(screenBuffer)
-			backend.drawCellForegrounds(screenBuffer)
-			//backend.screen.Redraw = false
-			//}
+			if backend.screen.Redraw {
+				backend.drawCellBackgrounds(screenBuffer)
+				backend.drawCellForegrounds(screenBuffer)
+				backend.screen.Redraw = false
+			}
 
 			//backend.op.GeoM.Reset()
 			//screenBuffer.DrawImage(backend.imageBuffer, backend.op)
@@ -223,9 +223,9 @@ func (backend *BackendEbiten) syncGlyphs(id glyphs.ID) {
 func (backend *BackendEbiten) drawCellForegrounds(target *ebiten.Image) {
 	for y := 0; y < len(backend.screen.cells); y++ {
 		for x := 0; x < len(backend.screen.cells[y]); x++ {
-			/*if !backend.screen.cells[y][x].Redraw {
+			if !backend.screen.cells[y][x].Redraw {
 				continue
-			}*/
+			}
 			fg := backend.screen.cells[y][x].Style.Foreground
 			if fg == ColorNone {
 				fg = backend.screen.Foreground
@@ -255,9 +255,9 @@ func (backend *BackendEbiten) drawCellForegrounds(target *ebiten.Image) {
 func (backend *BackendEbiten) drawCellBackgrounds(target *ebiten.Image) {
 	for y := 0; y < len(backend.screen.cells); y++ {
 		for x := 0; x < len(backend.screen.cells[y]); x++ {
-			/*if !backend.screen.cells[y][x].Redraw {
+			if !backend.screen.cells[y][x].Redraw {
 				continue
-			}*/
+			}
 			bg := backend.screen.cells[y][x].Style.Background
 			if bg == ColorNone {
 				bg = backend.screen.Background
