@@ -108,6 +108,9 @@ func (screen *Screen) DrawRune(x int, y int, r rune, s Style) error {
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
+	if screen.cells[y][x].Rune == r && screen.cells[y][x].Style == s {
+		return nil
+	}
 	screen.cells[y][x].PendingRune = r
 	screen.cells[y][x].PendingStyle = s
 	screen.cells[y][x].Dirty = true
@@ -136,6 +139,9 @@ func (screen *Screen) SetForeground(x int, y int, c Color) error {
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
+	if screen.cells[y][x].Style.Foreground == c {
+		return nil
+	}
 	screen.cells[y][x].PendingStyle.Foreground = c
 	screen.cells[y][x].Dirty = true
 	return nil
@@ -145,6 +151,9 @@ func (screen *Screen) SetForeground(x int, y int, c Color) error {
 func (screen *Screen) SetBackground(x int, y int, c Color) error {
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
+	}
+	if screen.cells[y][x].Style.Background == c {
+		return nil
 	}
 	screen.cells[y][x].PendingStyle.Background = c
 	screen.cells[y][x].Dirty = true
@@ -156,6 +165,9 @@ func (screen *Screen) SetStyle(x int, y int, s Style) error {
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
+	if screen.cells[y][x].Style == s {
+		return nil
+	}
 	screen.cells[y][x].PendingStyle = s
 	screen.cells[y][x].Dirty = true
 	return nil
@@ -166,6 +178,9 @@ func (screen *Screen) SetRune(x int, y int, r rune) error {
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
+	if screen.cells[y][x].Rune == r {
+		return nil
+	}
 	screen.cells[y][x].PendingRune = r
 	screen.cells[y][x].Dirty = true
 	return nil
@@ -175,6 +190,9 @@ func (screen *Screen) SetRune(x int, y int, r rune) error {
 func (screen *Screen) SetGlyphsID(x int, y int, id glyphs.ID) error {
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
+	}
+	if screen.cells[y][x].Glyphs == id {
+		return nil
 	}
 	screen.cells[y][x].Glyphs = id
 	screen.cells[y][x].Redraw = true
