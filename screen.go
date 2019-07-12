@@ -20,6 +20,7 @@ package goro
 
 import (
 	"errors"
+	"sync"
 
 	"github.com/kettek/goro/glyphs"
 )
@@ -37,6 +38,7 @@ type Screen struct {
 	Foreground       Color
 	Background       Color
 	Redraw           bool
+	cellsMutex       sync.Mutex
 }
 
 // Init initializes the Screen's data structures and default values.
@@ -69,6 +71,8 @@ func (screen *Screen) Close() {
 
 // Sync synchronizes the screen's actual cells with the current Rows and Columns.
 func (screen *Screen) Sync() (err error) {
+	screen.cellsMutex.Lock()
+	defer screen.cellsMutex.Unlock()
 	currRows := len(screen.cells)
 	// Grow or shrink our rows.
 	if currRows < screen.Rows {
@@ -105,6 +109,8 @@ func (screen *Screen) checkBounds(x, y int) error {
 
 // DrawRune draws a given rune at the position of x and y with a given style.
 func (screen *Screen) DrawRune(x int, y int, r rune, s Style) error {
+	screen.cellsMutex.Lock()
+	defer screen.cellsMutex.Unlock()
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
@@ -136,6 +142,8 @@ func (screen *Screen) DrawString(x int, y int, str string, s Style) error {
 
 // SetForeground sets the foreground at the given location.
 func (screen *Screen) SetForeground(x int, y int, c Color) error {
+	screen.cellsMutex.Lock()
+	defer screen.cellsMutex.Unlock()
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
@@ -149,6 +157,8 @@ func (screen *Screen) SetForeground(x int, y int, c Color) error {
 
 // SetBackground sets the background at the given location.
 func (screen *Screen) SetBackground(x int, y int, c Color) error {
+	screen.cellsMutex.Lock()
+	defer screen.cellsMutex.Unlock()
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
@@ -162,6 +172,8 @@ func (screen *Screen) SetBackground(x int, y int, c Color) error {
 
 // SetStyle sets the style at the given location.
 func (screen *Screen) SetStyle(x int, y int, s Style) error {
+	screen.cellsMutex.Lock()
+	defer screen.cellsMutex.Unlock()
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
@@ -175,6 +187,8 @@ func (screen *Screen) SetStyle(x int, y int, s Style) error {
 
 // SetRune sets the rune at the given location.
 func (screen *Screen) SetRune(x int, y int, r rune) error {
+	screen.cellsMutex.Lock()
+	defer screen.cellsMutex.Unlock()
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
@@ -188,6 +202,8 @@ func (screen *Screen) SetRune(x int, y int, r rune) error {
 
 // SetGlyphsID sets the glyphs at a given location.
 func (screen *Screen) SetGlyphsID(x int, y int, id glyphs.ID) error {
+	screen.cellsMutex.Lock()
+	defer screen.cellsMutex.Unlock()
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
@@ -211,6 +227,7 @@ func (screen *Screen) Clear() {
 
 // Flush forcibly causes the screen to commit any pending changes via a Draw* call and render to the backend.
 func (screen *Screen) Flush() {
+	screen.cellsMutex.Lock()
 	for y := 0; y < len(screen.cells); y++ {
 		for x := 0; x < len(screen.cells[y]); x++ {
 			if screen.cells[y][x].Dirty {
@@ -222,12 +239,15 @@ func (screen *Screen) Flush() {
 		}
 	}
 	screen.Redraw = true
+	defer screen.cellsMutex.Unlock()
 	// hmm. We're calling this here so we can force render the view.
 	globalBackend.Refresh()
 }
 
 // ForceRedraw marks each cell of the screen to be redrawn.
 func (screen *Screen) ForceRedraw() {
+	screen.cellsMutex.Lock()
+	defer screen.cellsMutex.Unlock()
 	for y := 0; y < len(screen.cells); y++ {
 		for x := 0; x < len(screen.cells[y]); x++ {
 			screen.cells[y][x].Redraw = true

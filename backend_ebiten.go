@@ -221,6 +221,7 @@ func (backend *BackendEbiten) syncGlyphs(id glyphs.ID) {
 
 // drawCellForegrounds draws the colored glyphs for the cell at x and y.
 func (backend *BackendEbiten) drawCellForegrounds(target *ebiten.Image) {
+	backend.screen.cellsMutex.Lock()
 	for y := 0; y < len(backend.screen.cells); y++ {
 		for x := 0; x < len(backend.screen.cells[y]); x++ {
 			if !backend.screen.cells[y][x].Redraw {
@@ -249,10 +250,12 @@ func (backend *BackendEbiten) drawCellForegrounds(target *ebiten.Image) {
 			backend.screen.cells[y][x].Redraw = false
 		}
 	}
+	backend.screen.cellsMutex.Unlock()
 }
 
 // drawCellBackgrounds draws the background at the cell at x and y
 func (backend *BackendEbiten) drawCellBackgrounds(target *ebiten.Image) {
+	backend.screen.cellsMutex.Lock()
 	for y := 0; y < len(backend.screen.cells); y++ {
 		for x := 0; x < len(backend.screen.cells[y]); x++ {
 			if !backend.screen.cells[y][x].Redraw {
@@ -269,6 +272,7 @@ func (backend *BackendEbiten) drawCellBackgrounds(target *ebiten.Image) {
 			target.DrawImage(backend.emptyCell, backend.op)
 		}
 	}
+	backend.screen.cellsMutex.Unlock()
 }
 
 func (backend *BackendEbiten) DrawRect(image *ebiten.Image, x0, y0, x1, y1 float32, c Color) {
