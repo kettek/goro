@@ -124,14 +124,14 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 
 		// Draw
 		if !ebiten.IsDrawingSkipped() {
-			if backend.screen.Redraw {
-				backend.drawCellBackgrounds()
-				backend.drawCellForegrounds()
-				backend.screen.Redraw = false
-			}
+			//if backend.screen.Redraw {
+			backend.drawCellBackgrounds(screenBuffer)
+			backend.drawCellForegrounds(screenBuffer)
+			//backend.screen.Redraw = false
+			//}
 
-			backend.op.GeoM.Reset()
-			screenBuffer.DrawImage(backend.imageBuffer, backend.op)
+			//backend.op.GeoM.Reset()
+			//screenBuffer.DrawImage(backend.imageBuffer, backend.op)
 		}
 
 		return nil
@@ -220,12 +220,12 @@ func (backend *BackendEbiten) syncGlyphs(id glyphs.ID) {
 }
 
 // drawCellForegrounds draws the colored glyphs for the cell at x and y.
-func (backend *BackendEbiten) drawCellForegrounds() {
+func (backend *BackendEbiten) drawCellForegrounds(target *ebiten.Image) {
 	for y := 0; y < len(backend.screen.cells); y++ {
 		for x := 0; x < len(backend.screen.cells[y]); x++ {
-			if !backend.screen.cells[y][x].Redraw {
+			/*if !backend.screen.cells[y][x].Redraw {
 				continue
-			}
+			}*/
 			fg := backend.screen.cells[y][x].Style.Foreground
 			if fg == ColorNone {
 				fg = backend.screen.Foreground
@@ -237,7 +237,7 @@ func (backend *BackendEbiten) drawCellForegrounds() {
 				case *glyphs.Truetype:
 					bounds, _, _ := glyphSet.Normal.GlyphBounds(backend.screen.cells[y][x].Rune)
 					text.Draw(
-						backend.imageBuffer,
+						target,
 						string(backend.screen.cells[y][x].Rune),
 						glyphSet.Normal,
 						x*glyphSet.Width()+(glyphSet.Width()/2-bounds.Max.X.Round()/2),
@@ -252,12 +252,12 @@ func (backend *BackendEbiten) drawCellForegrounds() {
 }
 
 // drawCellBackgrounds draws the background at the cell at x and y
-func (backend *BackendEbiten) drawCellBackgrounds() {
+func (backend *BackendEbiten) drawCellBackgrounds(target *ebiten.Image) {
 	for y := 0; y < len(backend.screen.cells); y++ {
 		for x := 0; x < len(backend.screen.cells[y]); x++ {
-			if !backend.screen.cells[y][x].Redraw {
+			/*if !backend.screen.cells[y][x].Redraw {
 				continue
-			}
+			}*/
 			bg := backend.screen.cells[y][x].Style.Background
 			if bg == ColorNone {
 				bg = backend.screen.Background
@@ -266,7 +266,7 @@ func (backend *BackendEbiten) drawCellBackgrounds() {
 			backend.emptyCell.Fill(bg)
 			backend.op.GeoM.Reset()
 			backend.op.GeoM.Translate(float64(x*backend.glyphs[id].Width()), float64(y*backend.glyphs[id].Height()))
-			backend.imageBuffer.DrawImage(backend.emptyCell, backend.op)
+			target.DrawImage(backend.emptyCell, backend.op)
 		}
 	}
 }
