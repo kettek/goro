@@ -125,14 +125,8 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 		// Draw
 		if !ebiten.IsDrawingSkipped() {
 			if backend.screen.Redraw {
-				for y := 0; y < len(backend.screen.cells); y++ {
-					for x := 0; x < len(backend.screen.cells[y]); x++ {
-						if backend.screen.cells[y][x].Redraw {
-							backend.DrawCell(x, y)
-							backend.screen.cells[y][x].Redraw = false
-						}
-					}
-				}
+				backend.drawCellBackgrounds()
+				backend.drawCellForegrounds()
 				backend.screen.Redraw = false
 			}
 
@@ -225,36 +219,54 @@ func (backend *BackendEbiten) syncGlyphs(id glyphs.ID) {
 	backend.Refresh()
 }
 
-// DrawCell draws the cell at x and y. This includes foreground character and background color.
-func (backend *BackendEbiten) DrawCell(x, y int) {
-	fg := backend.screen.cells[y][x].Style.Foreground
-	if fg == ColorNone {
-		fg = backend.screen.Foreground
+// drawCellForegrounds draws the colored glyphs for the cell at x and y.
+func (backend *BackendEbiten) drawCellForegrounds() {
+	for y := 0; y < len(backend.screen.cells); y++ {
+		for x := 0; x < len(backend.screen.cells[y]); x++ {
+			if !backend.screen.cells[y][x].Redraw {
+				continue
+			}
+			fg := backend.screen.cells[y][x].Style.Foreground
+			if fg == ColorNone {
+				fg = backend.screen.Foreground
+			}
+			// Draw our rune
+			if backend.screen.cells[y][x].Rune != rune(0) {
+				glyphSet := backend.glyphs[backend.screen.cells[y][x].Glyphs]
+				switch glyphSet := glyphSet.(type) {
+				case *glyphs.Truetype:
+					bounds, _, _ := glyphSet.Normal.GlyphBounds(backend.screen.cells[y][x].Rune)
+					text.Draw(
+						backend.imageBuffer,
+						string(backend.screen.cells[y][x].Rune),
+						glyphSet.Normal,
+						x*glyphSet.Width()+(glyphSet.Width()/2-bounds.Max.X.Round()/2),
+						y*glyphSet.Height()+glyphSet.Ascent(),
+						fg,
+					)
+				}
+			}
+			backend.screen.cells[y][x].Redraw = false
+		}
 	}
-	bg := backend.screen.cells[y][x].Style.Background
-	if bg == ColorNone {
-		bg = backend.screen.Background
-	}
-	// Draw our background
-	id := backend.screen.cells[y][x].Glyphs
-	backend.emptyCell.Fill(bg)
-	backend.op.GeoM.Reset()
-	backend.op.GeoM.Translate(float64(x*backend.glyphs[id].Width()), float64(y*backend.glyphs[id].Height()))
-	backend.imageBuffer.DrawImage(backend.emptyCell, backend.op)
-	// Draw our rune
-	if backend.screen.cells[y][x].Rune != rune(0) {
-		glyphSet := backend.glyphs[backend.screen.cells[y][x].Glyphs]
-		switch glyphSet := glyphSet.(type) {
-		case *glyphs.Truetype:
-			bounds, _, _ := glyphSet.Normal.GlyphBounds(backend.screen.cells[y][x].Rune)
-			text.Draw(
-				backend.imageBuffer,
-				string(backend.screen.cells[y][x].Rune),
-				glyphSet.Normal,
-				x*glyphSet.Width()+(glyphSet.Width()/2-bounds.Max.X.Round()/2),
-				y*glyphSet.Height()+glyphSet.Ascent(),
-				fg,
-			)
+}
+
+// drawCellBackgrounds draws the background at the cell at x and y
+func (backend *BackendEbiten) drawCellBackgrounds() {
+	for y := 0; y < len(backend.screen.cells); y++ {
+		for x := 0; x < len(backend.screen.cells[y]); x++ {
+			if !backend.screen.cells[y][x].Redraw {
+				continue
+			}
+			bg := backend.screen.cells[y][x].Style.Background
+			if bg == ColorNone {
+				bg = backend.screen.Background
+			}
+			id := backend.screen.cells[y][x].Glyphs
+			backend.emptyCell.Fill(bg)
+			backend.op.GeoM.Reset()
+			backend.op.GeoM.Translate(float64(x*backend.glyphs[id].Width()), float64(y*backend.glyphs[id].Height()))
+			backend.imageBuffer.DrawImage(backend.emptyCell, backend.op)
 		}
 	}
 }
