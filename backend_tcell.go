@@ -139,6 +139,8 @@ func (backend *BackendTCell) SetScale(scale float64) {
 
 // draw is used for drawing the screen's cells to the tcell screen.
 func (backend *BackendTCell) draw() {
+	backend.screen.cellsMutex.Lock()
+	defer backend.screen.cellsMutex.Unlock()
 	if backend.screen.Redraw {
 		for y := 0; y < len(backend.screen.cells); y++ {
 			for x := 0; x < len(backend.screen.cells[y]); x++ {
