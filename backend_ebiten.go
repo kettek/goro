@@ -125,13 +125,13 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 		// Draw
 		if !ebiten.IsDrawingSkipped() {
 			if backend.screen.Redraw {
-				backend.drawCellBackgrounds(screenBuffer)
-				backend.drawCellForegrounds(screenBuffer)
+				backend.drawCellBackgrounds(backend.imageBuffer)
+				backend.drawCellForegrounds(backend.imageBuffer)
 				backend.screen.Redraw = false
 			}
 
-			//backend.op.GeoM.Reset()
-			//screenBuffer.DrawImage(backend.imageBuffer, backend.op)
+			backend.op.GeoM.Reset()
+			screenBuffer.DrawImage(backend.imageBuffer, backend.op)
 		}
 
 		return nil
