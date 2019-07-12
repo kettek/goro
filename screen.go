@@ -114,7 +114,7 @@ func (screen *Screen) DrawRune(x int, y int, r rune, s Style) error {
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
-	if screen.cells[y][x].Rune == r && screen.cells[y][x].Style == s {
+	if screen.cells[y][x].PendingRune == r && screen.cells[y][x].PendingStyle == s {
 		return nil
 	}
 	screen.cells[y][x].PendingRune = r
@@ -147,7 +147,7 @@ func (screen *Screen) SetForeground(x int, y int, c Color) error {
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
-	if screen.cells[y][x].Style.Foreground == c {
+	if screen.cells[y][x].PendingStyle.Foreground == c {
 		return nil
 	}
 	screen.cells[y][x].PendingStyle.Foreground = c
@@ -162,7 +162,7 @@ func (screen *Screen) SetBackground(x int, y int, c Color) error {
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
-	if screen.cells[y][x].Style.Background == c {
+	if screen.cells[y][x].PendingStyle.Background == c {
 		return nil
 	}
 	screen.cells[y][x].PendingStyle.Background = c
@@ -177,7 +177,7 @@ func (screen *Screen) SetStyle(x int, y int, s Style) error {
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
-	if screen.cells[y][x].Style == s {
+	if screen.cells[y][x].PendingStyle == s {
 		return nil
 	}
 	screen.cells[y][x].PendingStyle = s
@@ -192,7 +192,7 @@ func (screen *Screen) SetRune(x int, y int, r rune) error {
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
-	if screen.cells[y][x].Rune == r {
+	if screen.cells[y][x].PendingRune == r {
 		return nil
 	}
 	screen.cells[y][x].PendingRune = r
@@ -207,11 +207,11 @@ func (screen *Screen) SetGlyphsID(x int, y int, id glyphs.ID) error {
 	if err := screen.checkBounds(x, y); err != nil {
 		return err
 	}
-	if screen.cells[y][x].Glyphs == id {
+	if screen.cells[y][x].PendingGlyphs == id {
 		return nil
 	}
-	screen.cells[y][x].Glyphs = id
-	screen.cells[y][x].Redraw = true
+	screen.cells[y][x].PendingGlyphs = id
+	screen.cells[y][x].Dirty = true
 	return nil
 }
 
@@ -233,6 +233,7 @@ func (screen *Screen) Flush() {
 			if screen.cells[y][x].Dirty {
 				screen.cells[y][x].Rune = screen.cells[y][x].PendingRune
 				screen.cells[y][x].Style = screen.cells[y][x].PendingStyle
+				screen.cells[y][x].Glyphs = screen.cells[y][x].PendingGlyphs
 				screen.cells[y][x].Dirty = false
 				screen.cells[y][x].Redraw = true
 			}
