@@ -35,4 +35,5 @@ type Backend interface {
 	SetScale(float64)
 	SetTitle(string)
 	SetGlyphs(glyphs.ID, string, float64) error
+	SyncSize()
 }

@@ -330,3 +330,8 @@ var shiftMap = map[rune]bool{
 func (backend *BackendTCell) SetGlyphs(id glyphs.ID, path string, size float64) error {
 	return nil
 }
+
+// SyncSize does nothing!
+func (backend *BackendTCell) SyncSize() {
+	return
+}

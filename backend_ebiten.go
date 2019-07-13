@@ -219,6 +219,18 @@ func (backend *BackendEbiten) syncGlyphs(id glyphs.ID) {
 	backend.Refresh()
 }
 
+// SyncSize is the external call to synchronize the screen's size.
+func (backend *BackendEbiten) SyncSize() {
+	c, r := backend.screen.Size()
+	newWidth := c * backend.glyphs[0].Width()
+	newHeight := r * backend.glyphs[0].Height()
+
+	backend.SetSize(newWidth, newHeight)
+
+	backend.screen.ForceRedraw()
+	backend.Refresh()
+}
+
 // drawCellForegrounds draws the colored glyphs for the cell at x and y.
 func (backend *BackendEbiten) drawCellForegrounds(target *ebiten.Image) {
 	backend.screen.cellsMutex.Lock()

@@ -279,6 +279,7 @@ func (screen *Screen) SetSize(c, r int) {
 	screen.Columns = c
 	screen.Rows = r
 	screen.Sync()
+	globalBackend.SyncSize()
 }
 
 // WindowSize returns the current backend's window size in its preferred units, if available.
