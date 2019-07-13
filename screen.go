@@ -279,7 +279,6 @@ func (screen *Screen) SetSize(c, r int) {
 	screen.Columns = c
 	screen.Rows = r
 	screen.Sync()
-	screen.ForceRedraw()
 	globalBackend.SyncSize()
 }
 

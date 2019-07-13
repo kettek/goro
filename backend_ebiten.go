@@ -149,6 +149,7 @@ func (backend *BackendEbiten) Size() (int, int) {
 func (backend *BackendEbiten) SetSize(w, h int) {
 	backend.width, backend.height = w, h
 	ebiten.SetScreenSize(w, h)
+	backend.imageBuffer, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
 }
 
 // Units returns the unit type the backend uses for Size().
@@ -213,7 +214,6 @@ func (backend *BackendEbiten) syncGlyphs(id glyphs.ID) {
 
 	// Is this needed?
 	backend.emptyCell, _ = ebiten.NewImage(backend.glyphs[id].Width(), backend.glyphs[id].Height(), ebiten.FilterDefault)
-	backend.imageBuffer, _ = ebiten.NewImage(newWidth, newHeight, ebiten.FilterDefault)
 
 	backend.screen.ForceRedraw()
 	backend.Refresh()
@@ -227,7 +227,6 @@ func (backend *BackendEbiten) SyncSize() {
 
 	backend.SetSize(newWidth, newHeight)
 
-	backend.screen.ForceRedraw()
 	backend.Refresh()
 }
 
