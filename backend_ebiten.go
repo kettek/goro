@@ -102,8 +102,8 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 				backend.pressedKeys[k]++
 				if backend.pressedKeys[k] == 1 {
 					keyEvents = append(keyEvents, backend.ebitenKeyToEventKey(k))
-				} else if backend.pressedKeys[k] >= 12 { // repeat keypresses every 200ms TODO: make user configurable
-					backend.pressedKeys[k] -= 12
+				} else if backend.pressedKeys[k] >= 30 { // repeat keypresses every 500ms TODO: make user configurable
+					backend.pressedKeys[k] -= 30
 					keyEvents = append(keyEvents, backend.ebitenKeyToEventKey(k))
 				}
 			} else {
