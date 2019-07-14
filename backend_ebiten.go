@@ -40,7 +40,7 @@ type BackendEbiten struct {
 	glyphs        []glyphs.Glyphs
 	emptyCell     *ebiten.Image
 
-	pressedKeys  []bool
+	pressedKeys  []int
 	pressedMouse []bool
 	refreshChan  chan struct{}
 }
@@ -52,7 +52,7 @@ func InitEbiten() error {
 
 // Init sets up our appropriate data structures.
 func (backend *BackendEbiten) Init() error {
-	backend.pressedKeys = make([]bool, ebiten.KeyMax+1)
+	backend.pressedKeys = make([]int, ebiten.KeyMax+1)
 	backend.pressedMouse = make([]bool, ebiten.MouseButtonMiddle+1)
 
 	backend.imageBuffer, _ = ebiten.NewImage(320, 240, ebiten.FilterDefault)
@@ -99,12 +99,15 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 		// ... Ew.
 		for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
 			if ebiten.IsKeyPressed(k) {
-				if !backend.pressedKeys[k] {
+				backend.pressedKeys[k]++
+				if backend.pressedKeys[k] == 1 {
 					keyEvents = append(keyEvents, backend.ebitenKeyToEventKey(k))
 				}
-				backend.pressedKeys[k] = true
+				for ; backend.pressedKeys[k] >= 12; backend.pressedKeys[k] -= 12 { // repeat keypresses every 200ms
+					keyEvents = append(keyEvents, backend.ebitenKeyToEventKey(k))
+				}
 			} else {
-				backend.pressedKeys[k] = false
+				backend.pressedKeys[k] = 0
 			}
 		}
 		// FIXME: This isn't exactly right for non-US keyboards...
@@ -125,9 +128,9 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 			keyEvents = append(keyEvents, EventKey{
 				Key:   KeyNull,
 				Rune:  r,
-				Shift: backend.pressedKeys[ebiten.KeyShift],
-				Ctrl:  backend.pressedKeys[ebiten.KeyControl],
-				Alt:   backend.pressedKeys[ebiten.KeyAlt],
+				Shift: backend.pressedKeys[ebiten.KeyShift] > 0,
+				Ctrl:  backend.pressedKeys[ebiten.KeyControl] > 0,
+				Alt:   backend.pressedKeys[ebiten.KeyAlt] > 0,
 			})
 		}
 		// Send our KeyEvents
@@ -355,13 +358,13 @@ func (backend *BackendEbiten) ebitenKeyToEventKey(k ebiten.Key) (eventKey EventK
 
 	eventKey.Key = key
 
-	if backend.pressedKeys[ebiten.KeyShift] {
+	if backend.pressedKeys[ebiten.KeyShift] > 0 {
 		eventKey.Shift = true
 	}
-	if backend.pressedKeys[ebiten.KeyControl] {
+	if backend.pressedKeys[ebiten.KeyControl] > 0 {
 		eventKey.Ctrl = true
 	}
-	if backend.pressedKeys[ebiten.KeyAlt] {
+	if backend.pressedKeys[ebiten.KeyAlt] > 0 {
 		eventKey.Alt = true
 	}
 	// TODO: Meta?
