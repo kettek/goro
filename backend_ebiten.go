@@ -99,13 +99,13 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 		// ... Ew.
 		for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
 			if ebiten.IsKeyPressed(k) {
-				backend.pressedKeys[k]++
-				if backend.pressedKeys[k] == 1 {
+				if backend.pressedKeys[k] == 0 {
 					keyEvents = append(keyEvents, backend.ebitenKeyToEventKey(k))
 				} else if backend.pressedKeys[k] >= 30 { // repeat keypresses every 500ms TODO: make user configurable
 					backend.pressedKeys[k] -= 30
 					keyEvents = append(keyEvents, backend.ebitenKeyToEventKey(k))
 				}
+				backend.pressedKeys[k]++
 			} else {
 				backend.pressedKeys[k] = 0
 			}
