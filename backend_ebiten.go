@@ -21,7 +21,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 import (
-	"fmt"
 	"path"
 	"strings"
 
@@ -96,20 +95,48 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 			backend.hasStarted = true
 		}
 
+		keyEvents := make([]EventKey, 0)
 		// ... Ew.
 		for k := ebiten.Key(0); k <= ebiten.KeyMax; k++ {
 			if ebiten.IsKeyPressed(k) {
 				if !backend.pressedKeys[k] {
-					fmt.Printf("Sending %d.\n", int16(k))
-					if backend.screen.UseKeys {
-						backend.screen.eventChan <- Event(backend.ebitenKeyToEventKey(k))
-					}
+					keyEvents = append(keyEvents, backend.ebitenKeyToEventKey(k))
 				}
 				backend.pressedKeys[k] = true
 			} else {
 				backend.pressedKeys[k] = false
 			}
 		}
+		// FIXME: This isn't exactly right for non-US keyboards...
+		inputRunes := ebiten.InputChars()
+		for i, k := range keyEvents {
+			for i2, r := range inputRunes {
+				if k2, ok := RuneToKeyMap[r]; ok {
+					if k2 == k.Key {
+						keyEvents[i].Rune = r
+						inputRunes = append(inputRunes[:i2], inputRunes[i2+1:]...)
+						break
+					}
+				}
+			}
+		}
+		// Convert remaining inputRunes to KeyEvents
+		for _, r := range inputRunes {
+			keyEvents = append(keyEvents, EventKey{
+				Key:   KeyNull,
+				Rune:  r,
+				Shift: backend.pressedKeys[ebiten.KeyShift],
+				Ctrl:  backend.pressedKeys[ebiten.KeyControl],
+				Alt:   backend.pressedKeys[ebiten.KeyAlt],
+			})
+		}
+		// Send our KeyEvents
+		if backend.screen.UseKeys {
+			for _, k := range keyEvents {
+				backend.screen.eventChan <- k
+			}
+		}
+
 		// ... Ew x2.
 		for m := ebiten.MouseButtonLeft; m <= ebiten.MouseButtonMiddle; m++ {
 			if ebiten.IsMouseButtonPressed(m) {
@@ -327,7 +354,6 @@ func (backend *BackendEbiten) ebitenKeyToEventKey(k ebiten.Key) (eventKey EventK
 	}
 
 	eventKey.Key = key
-	eventKey.Rune = rune(key) // FIXME
 
 	if backend.pressedKeys[ebiten.KeyShift] {
 		eventKey.Shift = true
