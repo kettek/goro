@@ -123,7 +123,7 @@ const (
 	KeyLeftCurlyBracket
 	KeyPipe
 	KeyRightCurlyBracket
-	KeyTilde
+	KeyGraveAccent
 	KeyDelete
 	KeyAlt
 	KeyControl
@@ -131,10 +131,16 @@ const (
 	KeyCapsLock
 	KeyEnd
 	KeyMenu
+	KeyHome
 	KeyPrintScreen
 	KeyScrollLock
 	KeyEnter
 	KeyInsert
+	KeyPageUp
+	KeyPageDown
+	KeyPause
+	KeySemicolon
+	KeyApostrophe
 	KeyF1
 	KeyF2
 	KeyF3
@@ -147,6 +153,7 @@ const (
 	KeyF10
 	KeyF11
 	KeyF12
+	KeyNumLock
 	KeyKP0
 	KeyKP1
 	KeyKP2
@@ -160,8 +167,9 @@ const (
 	KeyKPAdd
 	KeyKPPeriod
 	KeyKPDivide
+	KeyKPDecimal
 	KeyKPEnter
-	KeyKPEquals
+	KeyKPEqual
 	KeyKPMultiply
 	KeyKPSubtract
 	KeyLeft
