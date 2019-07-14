@@ -325,7 +325,6 @@ func (backend *BackendEbiten) drawCellBackgrounds(target *ebiten.Image) {
 			if bg == ColorNone {
 				bg = backend.screen.Background
 			}
-			id := backend.screen.cells[y][x].Glyphs
 			backend.emptyCell.Fill(bg)
 			backend.op.GeoM.Reset()
 			backend.op.GeoM.Translate(float64(x*backend.cellWidth), float64(y*backend.cellHeight))
