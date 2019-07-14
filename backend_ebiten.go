@@ -32,13 +32,15 @@ import (
 
 // BackendEbiten is our Ebiten backend.
 type BackendEbiten struct {
-	screen        Screen
-	imageBuffer   *ebiten.Image
-	op            *ebiten.DrawImageOptions
-	width, height int
-	hasStarted    bool
-	glyphs        []glyphs.Glyphs
-	emptyCell     *ebiten.Image
+	screen                Screen
+	imageBuffer           *ebiten.Image
+	op                    *ebiten.DrawImageOptions
+	title                 string
+	width, height         int
+	cellWidth, cellHeight int
+	hasStarted            bool
+	glyphs                []glyphs.Glyphs
+	emptyCell             *ebiten.Image
 
 	pressedKeys  []int
 	pressedMouse []bool
@@ -67,6 +69,7 @@ func (backend *BackendEbiten) Init() error {
 
 	backend.refreshChan = make(chan struct{})
 
+	backend.title = "goro - Ebiten"
 	backend.width = 320
 	backend.height = 240
 
@@ -84,6 +87,8 @@ func (backend *BackendEbiten) Refresh() {
 
 // Setup runs the given function cb.
 func (backend *BackendEbiten) Setup(cb func(*Screen)) (err error) {
+	// Load our built-in glyphs
+	backend.SetGlyphsFromTTFBytes(0, resources.GoroTTF, 16)
 	cb(&backend.screen)
 	return nil
 }
@@ -92,8 +97,8 @@ func (backend *BackendEbiten) Setup(cb func(*Screen)) (err error) {
 func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 	err = ebiten.Run(func(screenBuffer *ebiten.Image) (err error) {
 		if !backend.hasStarted {
-			// Load our built-in glyphs
-			backend.SetGlyphsFromTTFBytes(0, resources.GoroTTF, 16)
+			// Is this needed?
+			backend.SyncSize()
 
 			go func() {
 				cb(&backend.screen)
@@ -173,7 +178,7 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 		}
 
 		return nil
-	}, backend.width, backend.height, 1, "GoingRogue - Ebiten")
+	}, backend.width, backend.height, 1, backend.title)
 
 	return err
 }
@@ -186,6 +191,9 @@ func (backend *BackendEbiten) Size() (int, int) {
 // SetSize sets the backend window to the provided width and height.
 func (backend *BackendEbiten) SetSize(w, h int) {
 	backend.width, backend.height = w, h
+	if !backend.hasStarted {
+		return
+	}
 	ebiten.SetScreenSize(w, h)
 	backend.imageBuffer, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
 }
@@ -207,6 +215,10 @@ func (backend *BackendEbiten) SetScale(scale float64) {
 
 // SetTitle sets the backend window's title.
 func (backend *BackendEbiten) SetTitle(title string) {
+	backend.title = title
+	if !backend.hasStarted {
+		return
+	}
 	ebiten.SetWindowTitle(title)
 }
 
@@ -244,26 +256,25 @@ func (backend *BackendEbiten) SetGlyphsFromTTFBytes(id glyphs.ID, bytes []byte, 
 
 // syncGlyphs synchronizes the screen's size and backend size, along with associated cached variables, to use the updated glyphs.
 func (backend *BackendEbiten) syncGlyphs(id glyphs.ID) {
-	c, r := backend.screen.Size()
-	newWidth := c * backend.glyphs[id].Width()
-	newHeight := r * backend.glyphs[id].Height()
-
-	backend.SetSize(newWidth, newHeight)
-
-	// Is this needed?
-	backend.emptyCell, _ = ebiten.NewImage(backend.glyphs[id].Width(), backend.glyphs[id].Height(), ebiten.FilterDefault)
+	backend.cellWidth = backend.glyphs[id].Width()
+	backend.cellHeight = backend.glyphs[id].Height()
 
 	backend.screen.ForceRedraw()
-	backend.Refresh()
+
+	backend.SyncSize()
 }
 
 // SyncSize is the external call to synchronize the screen's size.
 func (backend *BackendEbiten) SyncSize() {
 	c, r := backend.screen.Size()
-	newWidth := c * backend.glyphs[0].Width()
-	newHeight := r * backend.glyphs[0].Height()
+	newWidth := c * backend.cellWidth
+	newHeight := r * backend.cellHeight
 
 	backend.SetSize(newWidth, newHeight)
+
+	if backend.hasStarted {
+		backend.emptyCell, _ = ebiten.NewImage(backend.cellWidth, backend.cellHeight, ebiten.FilterDefault)
+	}
 
 	backend.Refresh()
 }
