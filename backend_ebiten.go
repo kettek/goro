@@ -190,11 +190,11 @@ func (backend *BackendEbiten) Size() (int, int) {
 // SetSize sets the backend window to the provided width and height.
 func (backend *BackendEbiten) SetSize(w, h int) {
 	backend.width, backend.height = w, h
-	if !backend.hasStarted {
-		return
+
+	if backend.hasStarted {
+		ebiten.SetScreenSize(w, h)
+		backend.imageBuffer, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
 	}
-	ebiten.SetScreenSize(w, h)
-	backend.imageBuffer, _ = ebiten.NewImage(w, h, ebiten.FilterDefault)
 }
 
 // Units returns the unit type the backend uses for Size().
@@ -273,6 +273,7 @@ func (backend *BackendEbiten) SyncSize() {
 
 	if backend.hasStarted {
 		backend.emptyCell, _ = ebiten.NewImage(backend.cellWidth, backend.cellHeight, ebiten.FilterDefault)
+		backend.imageBuffer, _ = ebiten.NewImage(backend.width, backend.height, ebiten.FilterDefault)
 	}
 
 	backend.Refresh()
@@ -327,7 +328,7 @@ func (backend *BackendEbiten) drawCellBackgrounds(target *ebiten.Image) {
 			id := backend.screen.cells[y][x].Glyphs
 			backend.emptyCell.Fill(bg)
 			backend.op.GeoM.Reset()
-			backend.op.GeoM.Translate(float64(x*backend.glyphs[id].Width()), float64(y*backend.glyphs[id].Height()))
+			backend.op.GeoM.Translate(float64(x*backend.cellWidth), float64(y*backend.cellHeight))
 			target.DrawImage(backend.emptyCell, backend.op)
 		}
 	}
