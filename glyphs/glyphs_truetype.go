@@ -5,7 +5,6 @@ import (
 
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"
-	"golang.org/x/image/math/fixed"
 )
 
 // Truetype is our Truetype data.
@@ -81,21 +80,11 @@ func (f *Truetype) rebuild() {
 	metrics := f.Normal.Metrics()
 	f.height = (metrics.Ascent + metrics.Descent).Round()
 
-	/*bounds, _, ok := f.Normal.GlyphBounds('M')
-	if !ok {
-		f.width = f.height // This is not good.
-	} else {
-		f.width = bounds.Max.X.Round()
-	}*/
-	width := fixed.Int26_6(0)
-
 	if advance, ok := f.Normal.GlyphAdvance('M'); ok {
-		width += advance
+		f.width = advance.Round()
+	} else {
+		f.width = f.height / 2
 	}
-	// Add kerning * 2... not sure if this is right but it allowed 16x16 monospace fonts to line up properly.
-	//width += f.Normal.Kern('M', 'M') + f.Normal.Kern('M', 'M')
-
-	f.width = width.Round()
 
 	f.ascent = metrics.Ascent.Round()
 }
