@@ -80,16 +80,17 @@ func (f *Truetype) rebuild() {
 	metrics := f.Normal.Metrics()
 	f.height = (metrics.Ascent + metrics.Descent).Round()
 
-	bounds, _, ok := f.Normal.GlyphBounds('M')
+	/*bounds, _, ok := f.Normal.GlyphBounds('M')
 	if !ok {
 		f.width = f.height // This is not good.
 	} else {
 		f.width = bounds.Max.X.Round()
-	}
+	}*/
 
 	if advance, ok := f.Normal.GlyphAdvance('M'); ok {
-		f.width += advance.Round()
+		f.width = advance.Round()
 	}
+	f.width += f.Normal.Kern('M', 'M').Round()
 
 	f.ascent = metrics.Ascent.Round()
 }
