@@ -93,7 +93,7 @@ func (f *Truetype) rebuild() {
 		width += advance
 	}
 	// Add kerning * 2... not sure if this is right but it allowed 16x16 monospace fonts to line up properly.
-	width += f.Normal.Kern('M', 'M') * 2
+	width += f.Normal.Kern('M', 'M') + f.Normal.Kern('M', 'M')
 
 	f.width += width.Round()
 
