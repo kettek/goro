@@ -25,6 +25,7 @@ import (
 // Backend is an interface through which a Screen is displayed and controlled.
 type Backend interface {
 	Init() error
+	Setup(func(*Screen)) error
 	Run(func(*Screen)) error
 	Refresh()
 	Quit()

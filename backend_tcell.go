@@ -67,6 +67,12 @@ func (backend *BackendTCell) Quit() {
 	backend.tcellScreen.Fini()
 }
 
+// Setup runs the given function cb.
+func (backend *BackendTCell) Setup(cb func(*Screen)) (err error) {
+	cb(&backend.screen)
+	return nil
+}
+
 // Run runs the given function cb as a goroutine and starts the entire tcell loop.
 func (backend *BackendTCell) Run(cb func(*Screen)) (err error) {
 	go func() {

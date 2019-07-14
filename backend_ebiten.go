@@ -82,6 +82,12 @@ func (backend *BackendEbiten) Quit() {
 func (backend *BackendEbiten) Refresh() {
 }
 
+// Setup runs the given function cb.
+func (backend *BackendEbiten) Setup(cb func(*Screen)) (err error) {
+	cb(&backend.screen)
+	return nil
+}
+
 // Run runs the given function cb as a goroutine.
 func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 	err = ebiten.Run(func(screenBuffer *ebiten.Image) (err error) {

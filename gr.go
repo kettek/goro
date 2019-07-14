@@ -36,6 +36,11 @@ func Quit() {
 	os.Exit(0)
 }
 
+// Setup takes a callback for setting up goro before the backend creates any windows. Optional.
+func Setup(cb func(*Screen)) error {
+	return globalBackend.Setup(cb)
+}
+
 // Run runs the Backend with the provided logic callback.
 func Run(cb func(*Screen)) error {
 	return globalBackend.Run(cb)
