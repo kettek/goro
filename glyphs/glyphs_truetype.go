@@ -5,6 +5,7 @@ import (
 
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"
+	"golang.org/x/image/math/fixed"
 )
 
 // Truetype is our Truetype data.
@@ -86,11 +87,14 @@ func (f *Truetype) rebuild() {
 	} else {
 		f.width = bounds.Max.X.Round()
 	}*/
+	width := fixed.Int26_6(0)
 
 	if advance, ok := f.Normal.GlyphAdvance('M'); ok {
-		f.width = advance.Round()
+		width += advance
 	}
-	f.width += f.Normal.Kern('M', 'M').Round()
+	width += f.Normal.Kern('M', 'M')
+
+	f.width += width.Round()
 
 	f.ascent = metrics.Ascent.Round()
 }
