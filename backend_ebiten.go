@@ -40,6 +40,7 @@ type BackendEbiten struct {
 	cellWidth, cellHeight int
 	hasStarted            bool
 	glyphs                []glyphs.Glyphs
+	useDefaultGlyphs      bool
 	emptyCell             *ebiten.Image
 
 	pressedKeys  []int
@@ -61,6 +62,7 @@ func (backend *BackendEbiten) Init() error {
 	backend.op = &ebiten.DrawImageOptions{}
 
 	backend.glyphs = make([]glyphs.Glyphs, 10)
+	backend.useDefaultGlyphs = true
 	backend.emptyCell, _ = ebiten.NewImage(16, 16, ebiten.FilterDefault)
 
 	if err := backend.screen.Init(); err != nil {
@@ -87,8 +89,6 @@ func (backend *BackendEbiten) Refresh() {
 
 // Setup runs the given function cb.
 func (backend *BackendEbiten) Setup(cb func(*Screen)) (err error) {
-	// Load our built-in glyphs
-	backend.SetGlyphsFromTTFBytes(0, resources.GoroTTF, 16)
 	cb(&backend.screen)
 	return nil
 }
@@ -98,6 +98,10 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 	err = ebiten.Run(func(screenBuffer *ebiten.Image) (err error) {
 		if !backend.hasStarted {
 			backend.hasStarted = true
+			if backend.useDefaultGlyphs {
+				// Load our built-in glyphs
+				backend.SetGlyphsFromTTFBytes(0, resources.GoroTTF, 16)
+			}
 			backend.SyncSize()
 
 			go func() {
@@ -223,6 +227,9 @@ func (backend *BackendEbiten) SetTitle(title string) {
 
 // SetGlyphs sets the glyphs to be used for rendering.
 func (backend *BackendEbiten) SetGlyphs(id glyphs.ID, filePath string, size float64) error {
+	if id == 0 {
+		backend.useDefaultGlyphs = false
+	}
 	ext := strings.ToLower(path.Ext(filePath))
 	switch ext {
 	case ".ttf":
