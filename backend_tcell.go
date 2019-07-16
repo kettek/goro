@@ -77,10 +77,8 @@ func (backend *BackendTCell) Setup(cb func(*Screen)) (err error) {
 
 // Run runs the given function cb as a goroutine and starts the entire tcell loop.
 func (backend *BackendTCell) Run(cb func(*Screen)) (err error) {
-	backend.hasStarted = true
 	go func() {
 		cb(&backend.screen)
-    backend.SetTitle(backend.title)
 	}()
 
 	// I guess this is okay to do.
@@ -91,6 +89,8 @@ func (backend *BackendTCell) Run(cb func(*Screen)) (err error) {
 		}
 	}()
 
+  backend.hasStarted = true
+  backend.SetTitle(backend.title)
 	for {
 		event := backend.tcellScreen.PollEvent()
 		switch event := event.(type) {
