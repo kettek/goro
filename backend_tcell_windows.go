@@ -22,4 +22,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 // SetTitle sets the backend window's title. This does nothing for non-CGO builds.
 func (backend *BackendTCell) SetTitle(title string) {
+	backend.title = title
 }

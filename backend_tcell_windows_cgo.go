@@ -36,6 +36,10 @@ var (
 
 // SetTitle sets the backend window's title.
 func (backend *BackendTCell) SetTitle(title string) {
+	backend.title = title
+	if !backend.hasStarted {
+		return
+	}
 	// This is a bogus way to check if we're in a Windows console or not, but...
 	if backend.tcellScreen.CharacterSet() == "UTF-16LE" {
 		cstr := C.CString(title)

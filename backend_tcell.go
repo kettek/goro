@@ -30,6 +30,8 @@ type BackendTCell struct {
 	screen      Screen
 	tcellScreen tcell.Screen
 	refreshChan chan struct{}
+	hasStarted  bool
+	title       string
 }
 
 // InitTCell initializes the TCell backend for use. Calls BackendTCell.Init().
@@ -75,6 +77,8 @@ func (backend *BackendTCell) Setup(cb func(*Screen)) (err error) {
 
 // Run runs the given function cb as a goroutine and starts the entire tcell loop.
 func (backend *BackendTCell) Run(cb func(*Screen)) (err error) {
+	backend.hasStarted = true
+  backend.SetTitle(backend.title)
 	go func() {
 		cb(&backend.screen)
 	}()

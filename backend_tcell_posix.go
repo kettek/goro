@@ -24,5 +24,9 @@ import "fmt"
 
 // SetTitle sets the backend window's title.
 func (backend *BackendTCell) SetTitle(title string) {
+	backend.title = title
+	if !backend.hasStarted {
+		return
+	}
 	fmt.Printf("\033]0;" + title + "\007")
 }
