@@ -186,18 +186,9 @@ func (p *PathAStar) calculateH(x, y int, tX, tY int) float64 {
 }
 
 func (p *PathAStar) tracePath(tX, tY int) (steps []Step) {
-  y := tY
-  x := tX
-
-  for ; p.nodes[y][x].parent != nil && p.nodes[y][x].parent.y != y && p.nodes[y][x].parent.x != x; {
-    steps = append(steps, Step{x: x, y: y})
-    tempX := p.nodes[y][x].parent.x
-    tempY := p.nodes[y][x].parent.y
-    x = tempX
-    y = tempY
+  for node := p.nodes[tY][tX]; node.parent != nil; node = node.parent {
+    steps = append(steps, Step{x: node.x, y: node.y})
   }
-
-  steps = append(steps, Step{x: x, y: y})
 
   // Reverse our steps.
   for i, j := 0, len(steps)-1; i < j; i, j = i+1, j-1 {
