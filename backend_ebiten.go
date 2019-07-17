@@ -99,6 +99,7 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 	err = ebiten.Run(func(screenBuffer *ebiten.Image) (err error) {
 		if !backend.hasStarted {
 			backend.hasStarted = true
+			backend.SyncSize()
 
 			go func() {
 				cb(&backend.screen)
