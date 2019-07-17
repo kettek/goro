@@ -157,8 +157,8 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
             p.nodes[y][x].fCost = f
             p.nodes[y][x].gCost = g
             p.nodes[y][x].hCost = h
-            p.nodes[y][x].parentY = y
-            p.nodes[y][x].parentX = x
+            p.nodes[y][x].parentY = node.y
+            p.nodes[y][x].parentX = node.x
           }
         }
       }
