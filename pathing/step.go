@@ -15,32 +15,9 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 package pathing
 
-// Path is our interface for paths.
-type Path interface {
-  Compute(oX, oY int, tX, tY int) []Step
-  HasRoute() bool
-  RouteSize() int
-}
-
-// Algorithm represents a pathing algorithm
-type Algorithm uint8
-
-// Our default algorithms
-const (
-	AlgorithmNone Algorithm = iota
-  AlgorithmAStar
-)
-
-// NewPathFromMap returns a new pathing map from the given pathMap interface.
-func NewPathFromMap(pathMap PathMap, algo Algorithm) Path {
-	switch algo {
-	default:
-		return nil
-	case AlgorithmNone:
-		return nil
-	case AlgorithmAStar:
-		return NewPathAStarFromMap(pathMap)
-	}
+type Step struct {
+  x, y int
 }

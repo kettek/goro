@@ -19,9 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package pathing
 
 import (
-  "fmt"
 	"math"
-  "errors"
 )
 
 //
@@ -87,13 +85,13 @@ func (p *PathAStar) Resize(width, height int) {
 	}
 }
 
-func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
+func (p *PathAStar) Compute(oX, oY int, tX, tY int) (steps []Step) {
   // Sanity checks.
   if tX < 0 || tX >= p.width || tY < 0 || tY >= p.height {
-    return errors.New("target is out of bounds")
+    return
   }
   if oX == tX && oY == tY {
-    return errors.New("target is origin")
+    return
   }
   // Set our first node's costs.
   p.nodes[oY][oX].gCost = 0
@@ -116,9 +114,9 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
 
     // If it is our destination then we've found a path.
     if current.y == tY && current.x == tX {
-      p.tracePath(tX, tY)
+      steps = p.tracePath(tX, tY)
       p.foundPath = true
-      return nil
+      return
     }
 
     // Remove it.
@@ -153,7 +151,7 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
     }
     //
   }
-  return errors.New("could not find path")
+  return
 }
 
 func (p *PathAStar) calculateH(x, y int, tX, tY int) float64 {
@@ -162,31 +160,20 @@ func (p *PathAStar) calculateH(x, y int, tX, tY int) float64 {
   return math.Sqrt(a + b)
 }
 
-func (p *PathAStar) tracePath(tX, tY int) {
+func (p *PathAStar) tracePath(tX, tY int) (steps []Step) {
   y := tY
   x := tX
-  path := make([]NodeAStar, 0)
 
   for ; p.nodes[y][x].parent != nil && p.nodes[y][x].parent.y != y && p.nodes[y][x].parent.x != x; {
-    path = append(path, NodeAStar{
-      x: x,
-      y: y,
-    })
+    steps = append([]Step{Step{x: x, y: y}}, steps...)
     tempX := p.nodes[y][x].parent.x
     tempY := p.nodes[y][x].parent.y
     x = tempX
     y = tempY
   }
 
-  path = append(path, NodeAStar{
-    x: x,
-    y: y,
-  })
-  for ; len(path) > 0; {
-    node := path[len(path)-1]
-    path = path[:len(path)-1]
-    fmt.Printf("-> (%d, %d) ", node.x, node.y)
-  }
+  steps = append([]Step{Step{x: x, y: y}}, steps...)
+  return
 }
 
 func (p *PathAStar) HasRoute() bool {
