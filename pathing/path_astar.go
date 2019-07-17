@@ -200,9 +200,9 @@ func (p *PathAStar) tracePath(tX, tY int) (steps []Step) {
   steps = append([]Step{Step{x: x, y: y}}, steps...)
 
   // Remove first step.
-  if len(steps) > 0 {
+  /*if len(steps) > 0 {
     steps = steps[1:]
-  }
+  }*/
   return
 }
 
