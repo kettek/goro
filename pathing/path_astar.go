@@ -143,7 +143,8 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
           p.foundPath = true
           return nil
         }
-        if closedList[y][x] == false && p.nodes[y][x].mCost != math.MaxUint32 {
+        //if closedList[y][x] == false && p.nodes[y][x].mCost != math.MaxUint32 {
+        if closedList[y][x] == false {
           g := node.gCost + 1.0
           if (math.Abs(float64(i)) + math.Abs(float64(j))) == 2 {
             g += 0.414
