@@ -190,7 +190,8 @@ func (p *PathAStar) tracePath(tX, tY int) (steps []Step) {
   x := tX
 
   for ; p.nodes[y][x].parent != nil && p.nodes[y][x].parent.y != y && p.nodes[y][x].parent.x != x; {
-    steps = append([]Step{Step{x: x, y: y}}, steps...)
+    //steps = append([]Step{Step{x: x, y: y}}, steps...)
+    steps = append(steps, Step{x: x, y: y})
     tempX := p.nodes[y][x].parent.x
     tempY := p.nodes[y][x].parent.y
     x = tempX
