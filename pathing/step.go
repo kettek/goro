@@ -21,3 +21,11 @@ package pathing
 type Step struct {
   x, y int
 }
+
+func (s Step) X() int {
+  return s.x
+}
+
+func (s Step) Y() int {
+  return s.x
+}
