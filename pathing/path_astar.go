@@ -159,14 +159,20 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
         }
         h := p.calculateH(x, y, tX, tY)
         f := g + h
-        //
-        if p.nodes[y][x].fCost == math.MaxFloat64 || p.nodes[y][x].fCost > f {
+        // If it is not in the open list yet (signified by MaxFloat64), add it to the open list.
+        if p.nodes[y][x].fCost == math.MaxFloat64 {
           p.nodes[y][x].fCost = f
           p.nodes[y][x].gCost = g
           p.nodes[y][x].hCost = h
           p.nodes[y][x].parentY = node.y
           p.nodes[y][x].parentX = node.x
           openNodes = append(openNodes, p.nodes[y][x])
+
+        } else if p.nodes[y][x].fCost > f { // Otherwise update it if it is a better path.
+          p.nodes[y][x].fCost = f
+          p.nodes[y][x].gCost = g
+          p.nodes[y][x].parentY = node.y
+          p.nodes[y][x].parentX = node.x
         }
       }
     }
