@@ -18,8 +18,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package pathing
 
+import (
+	"math"
+)
+
 type PathMap interface {
   Width() int
   Height() int
   CostAt(x, y int) int
 }
+
+const (
+  MaximumCost = math.MaxUint32
+)
