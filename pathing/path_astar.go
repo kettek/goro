@@ -153,16 +153,12 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
           f := g + h
           //
           if p.nodes[y][x].fCost == math.MaxFloat64 || p.nodes[y][x].fCost > f {
-            openNodes = append(openNodes, NodeAStar{
-              fCost: f,
-              x: x,
-              y: y,
-            })
             p.nodes[y][x].fCost = f
             p.nodes[y][x].gCost = g
             p.nodes[y][x].hCost = h
             p.nodes[y][x].parentY = node.y
             p.nodes[y][x].parentX = node.x
+            openNodes = append(openNodes, p.nodes[y][x])
           }
         }
       }
@@ -201,7 +197,7 @@ func (p *PathAStar) tracePath(tX, tY int) {
   for ; len(path) > 0; {
     node := path[len(path)-1]
     path = path[:len(path)-1]
-    fmt.Printf("-> (%d, %d) ", node.y, node.x)
+    fmt.Printf("-> (%d, %d) ", node.x, node.y)
   }
 }
 
