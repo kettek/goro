@@ -179,9 +179,10 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) (steps []Step) {
 }
 
 func (p *PathAStar) calculateH(x, y int, tX, tY int) float64 {
-  a := math.Pow(float64(y-tY), 2)
+  return math.Max(math.Abs(float64(x - tX)), math.Abs(float64(y - tY)))
+  /*a := math.Pow(float64(y-tY), 2)
   b := math.Pow(float64(x-tX), 2)
-  return math.Sqrt(a + b)
+  return math.Sqrt(a + b)*/
 }
 
 func (p *PathAStar) tracePath(tX, tY int) (steps []Step) {
