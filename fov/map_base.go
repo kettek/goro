@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package fov
 
 import (
+  "math"
 	"errors"
 	"strconv"
 )
@@ -155,6 +156,35 @@ func (fovMap *MapBase) Reset() {
 			fovMap.cells[y][x].Visible = false
 		}
 	}
+}
+
+// Width returns the width of the map.
+func (fovMap *MapBase) Width() int {
+  return fovMap.width
+}
+
+// Height returns the height of the map.
+func (fovMap *MapBase) Height() int {
+  return fovMap.height
+}
+
+// Height returns the movement cost of a tile in a map. This allows fov.Maps to be used for pathing.
+func (fovMap *MapBase) CostAt(x, y int) (int, error) {
+  if err := fovMap.CheckBounds(x, y); err != nil {
+    return math.MaxUint32, err
+  }
+  cost := 0
+	if fovMap.cells[y][x].BlocksMovement {
+    cost = math.MaxUint32
+  } else {
+    if fovMap.cells[y][x].BlocksLight {
+      cost++
+    }
+    if !fovMap.cells[y][x].Visible {
+      cost++
+    }
+  }
+  return cost, nil
 }
 
 // ToString returns a stringified view of the map.

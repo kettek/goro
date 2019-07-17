@@ -20,6 +20,9 @@ package fov
 
 // Map is our interface for field of view Maps.
 type Map interface {
+  Width() int
+  Height() int
+  CostAt(x, y int)
 	Resize(width, height int)
 	Clear(fovCell Cell)
 	Reset()
