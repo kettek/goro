@@ -60,7 +60,6 @@ func NewPathAStarFromMap(pathMap PathMap) Path {
       }
     }
   }
-  fmt.Printf("%+v", path.nodes)
 
   // calculate from each tile's movement cost.
   // calculate Blocked, etc. ?
@@ -117,12 +116,25 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
   openNodes = append(openNodes, p.nodes[y][x])
 
   for ; len(openNodes) > 0; {
-    var node NodeAStar = openNodes[0]
+    targetNode := 0
+    for i, n := range openNodes {
+      if n.fCost < openNodes[targetNode].fCost {
+        targetNode = i
+      }
+    }
+    var node NodeAStar = openNodes[targetNode]
     // remove top node from array
-    openNodes = openNodes[1:]
+    openNodes = append(openNodes[:targetNode], openNodes[targetNode+1:]...)
 
     // Add node to closed array.
     closedList[node.y][node.x] = true
+
+    // If it is our destination then we've found a path.
+    if node.y == tY && node.x == tX {
+      p.tracePath(oX, oY)
+      p.foundPath = true
+      return nil
+    }
 
     // Iterate through our eight directions
     for i := -1; i <= 1; i++ {
@@ -136,31 +148,25 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
         if y < 0 || y >= p.height || x < 0 || x >= p.width {
           continue
         }
-        // If it is our destination then we've found a path.
-        if y == tY && x == tX {
-          p.nodes[y][x].parentY = node.y
-          p.nodes[y][x].parentX = node.x
-          p.tracePath(oX, oY)
-          p.foundPath = true
-          return nil
+        // Skip if it is in our closed list.
+        if closedList[y][x] == true {
+          continue
         }
         //if closedList[y][x] == false && p.nodes[y][x].mCost != math.MaxUint32 {
-        if closedList[y][x] == false {
-          g := node.gCost + 1.0
-          if (math.Abs(float64(i)) + math.Abs(float64(j))) == 2 {
-            g += 0.414
-          }
-          h := p.calculateH(x, y, tX, tY)
-          f := g + h
-          //
-          if p.nodes[y][x].fCost == math.MaxFloat64 || p.nodes[y][x].fCost > f {
-            p.nodes[y][x].fCost = f
-            p.nodes[y][x].gCost = g
-            p.nodes[y][x].hCost = h
-            p.nodes[y][x].parentY = node.y
-            p.nodes[y][x].parentX = node.x
-            openNodes = append(openNodes, p.nodes[y][x])
-          }
+        g := node.gCost + 1.0
+        if (math.Abs(float64(i)) + math.Abs(float64(j))) == 2 {
+          g += 0.414
+        }
+        h := p.calculateH(x, y, tX, tY)
+        f := g + h
+        //
+        if p.nodes[y][x].fCost == math.MaxFloat64 || p.nodes[y][x].fCost > f {
+          p.nodes[y][x].fCost = f
+          p.nodes[y][x].gCost = g
+          p.nodes[y][x].hCost = h
+          p.nodes[y][x].parentY = node.y
+          p.nodes[y][x].parentX = node.x
+          openNodes = append(openNodes, p.nodes[y][x])
         }
       }
     }
