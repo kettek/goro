@@ -131,7 +131,7 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
 
     // If it is our destination then we've found a path.
     if node.y == tY && node.x == tX {
-      p.tracePath(oX, oY)
+      p.tracePath(tX, tY)
       p.foundPath = true
       return nil
     }
