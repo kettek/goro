@@ -124,7 +124,7 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
   for ; len(openNodes) > 0 && len(openNodes) < p.height*p.width; {
     var node NodeAStar = openNodes[0]
     // remove top node from array
-    openNodes = openNodes[:1]
+    openNodes = openNodes[1:]
 
     // Add node to closed array.
     closedList[node.y][node.x] = true
