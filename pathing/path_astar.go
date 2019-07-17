@@ -172,7 +172,7 @@ func (p *PathAStar) tracePath(tX, tY int) (steps []Step) {
     y = tempY
   }
 
-  steps = append([]Step{Step{x: x, y: y}}, steps...)
+  steps = append([]Step{Step{x: x, y: y}}, steps[1:]...)
   return
 }
 
