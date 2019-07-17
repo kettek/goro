@@ -130,7 +130,11 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) (steps []Step) {
           continue
         }
         neighbor := p.nodes[current.y+i][current.x+j]
-        g := current.gCost + 1 // TODO: diagonal costs
+        g := current.gCost + 1
+        // Add extra diagonal cost.
+        if (math.Abs(float64(i)) + math.Abs(float64(j))) == 2 {
+          g += .414
+        }
 
         // The path is better. Record it.
         if g < neighbor.gCost {
