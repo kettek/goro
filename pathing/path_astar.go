@@ -60,6 +60,7 @@ func NewPathAStarFromMap(pathMap PathMap) Path {
       }
     }
   }
+  fmt.Printf("%+v", path.nodes)
 
   // calculate from each tile's movement cost.
   // calculate Blocked, etc. ?
