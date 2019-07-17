@@ -62,7 +62,6 @@ func (backend *BackendEbiten) Init() error {
 	backend.op = &ebiten.DrawImageOptions{}
 
 	backend.glyphs = make([]glyphs.Glyphs, 10)
-	backend.useDefaultGlyphs = true
 	backend.emptyCell, _ = ebiten.NewImage(16, 16, ebiten.FilterDefault)
 
 	if err := backend.screen.Init(); err != nil {
@@ -74,6 +73,8 @@ func (backend *BackendEbiten) Init() error {
 	backend.title = "goro - Ebiten"
 	backend.width = 320
 	backend.height = 240
+
+	backend.SetGlyphsFromTTFBytes(0, resources.GoroTTF, 16)
 
 	return nil
 }
@@ -98,11 +99,6 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 	err = ebiten.Run(func(screenBuffer *ebiten.Image) (err error) {
 		if !backend.hasStarted {
 			backend.hasStarted = true
-			if backend.useDefaultGlyphs {
-				// Load our built-in glyphs
-				backend.SetGlyphsFromTTFBytes(0, resources.GoroTTF, 16)
-			}
-			backend.SyncSize()
 
 			go func() {
 				cb(&backend.screen)
