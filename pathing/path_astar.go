@@ -34,14 +34,11 @@ type NodeAStar struct {
 type PathAStar struct {
   width, height int
   foundPath bool
-  pathMap PathMap
   nodes [][]*NodeAStar
 }
 
 func NewPathAStarFromMap(pathMap PathMap) Path {
-  path := &PathAStar{
-    pathMap: pathMap,
-  }
+  path := &PathAStar{}
   path.Resize(pathMap.Width(), pathMap.Height())
 
   for y, n := range path.nodes {
@@ -59,6 +56,25 @@ func NewPathAStarFromMap(pathMap PathMap) Path {
 
   // calculate from each tile's movement cost.
   // calculate Blocked, etc. ?
+  return path
+}
+
+func NewPathAStarFromFunc(width, height int, calcFunc func(int, int) int) Path {
+  path := &PathAStar{}
+  path.Resize(width, height)
+
+  for y, n := range path.nodes {
+    for x, _ := range n {
+      path.nodes[y][x] = &NodeAStar{
+        y: y,
+        x: x,
+        fCost: math.MaxFloat64,
+        gCost: math.MaxFloat64,
+        hCost: math.MaxFloat64,
+        mCost: calcFunc(x, y),
+      }
+    }
+  }
   return path
 }
 
@@ -130,7 +146,11 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) (steps []Step) {
           continue
         }
         neighbor := p.nodes[current.y+i][current.x+j]
-        g := current.gCost + 1 + float64(p.pathMap.CostAt(current.x+j, current.y+i))
+        // Skip neighbor if it has maximum cost aka blocking
+        if neighbor.mCost == MaximumCost {
+          continue
+        }
+        g := current.gCost + 1 + float64(neighbor.mCost)
         // Add extra diagonal cost.
         if (math.Abs(float64(i)) + math.Abs(float64(j))) == 2 {
           g += .414

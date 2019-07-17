@@ -44,3 +44,15 @@ func NewPathFromMap(pathMap PathMap, algo Algorithm) Path {
 		return NewPathAStarFromMap(pathMap)
 	}
 }
+
+// NewPathFromFunc returns a new pathing map with movement costs calculated from calcFunc.
+func NewPathFromFunc(width, height int, calcFunc func(x int, y int) (cost int), algo Algorithm) Path {
+	switch algo {
+	default:
+		return nil
+	case AlgorithmNone:
+		return nil
+	case AlgorithmAStar:
+		return NewPathAStarFromFunc(width, height, calcFunc)
+	}
+}
