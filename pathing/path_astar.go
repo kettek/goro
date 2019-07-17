@@ -26,10 +26,10 @@ import (
 
 //
 type NodeAStar struct {
-  x,y int
-  parentX, parentY int
-  mCost int
+  parent *NodeAStar
+  x, y int // for deconstructing the path
   gCost, hCost, fCost float64
+  mCost int
 }
 
 // PathAStar represents a pathing structure for the A* algorithm.
@@ -37,7 +37,7 @@ type PathAStar struct {
   width, height int
   foundPath bool
   pathMap PathMap
-  nodes [][]NodeAStar
+  nodes [][]*NodeAStar
 }
 
 func NewPathAStarFromMap(pathMap PathMap) Path {
@@ -48,15 +48,13 @@ func NewPathAStarFromMap(pathMap PathMap) Path {
 
   for y, n := range path.nodes {
     for x, _ := range n {
-      path.nodes[y][x] = NodeAStar{
+      path.nodes[y][x] = &NodeAStar{
+        y: y,
+        x: x,
         fCost: math.MaxFloat64,
         gCost: math.MaxFloat64,
         hCost: math.MaxFloat64,
         mCost: pathMap.CostAt(x, y),
-        parentX: -1,
-        parentY: -1,
-        x: x,
-        y: y,
       }
     }
   }
@@ -74,7 +72,7 @@ func (p *PathAStar) Resize(width, height int) {
 	currHeight := len(p.nodes)
 	// Grow or shrink our height.
 	if currHeight < p.height {
-		p.nodes = append(p.nodes, make([][]NodeAStar, p.height-currHeight)...)
+		p.nodes = append(p.nodes, make([][]*NodeAStar, p.height-currHeight)...)
 	} else if currHeight > p.height {
 		p.nodes = p.nodes[:p.height]
 	}
@@ -82,7 +80,7 @@ func (p *PathAStar) Resize(width, height int) {
 	for y := range p.nodes {
 		currWidth := len(p.nodes[y])
 		if currWidth < p.width {
-			p.nodes[y] = append(p.nodes[y], make([]NodeAStar, p.width-currWidth)...)
+			p.nodes[y] = append(p.nodes[y], make([]*NodeAStar, p.width-currWidth)...)
 		} else if currWidth > p.width {
 			p.nodes[y] = p.nodes[y][:p.width]
 		}
@@ -90,89 +88,67 @@ func (p *PathAStar) Resize(width, height int) {
 }
 
 func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
-  closedList := make([][]bool, p.height)
-  for y := range closedList {
-    closedList[y] = make([]bool, p.width)
-  }
-
+  // Sanity checks.
   if tX < 0 || tX >= p.width || tY < 0 || tY >= p.height {
     return errors.New("target is out of bounds")
   }
   if oX == tX && oY == tY {
     return errors.New("target is origin")
   }
+  //
 
-  x := oX
-  y := oY
-  p.nodes[y][x] = NodeAStar{
-    fCost: 0,
+  openNodes := make([]*NodeAStar, 0)
+  openNodes = append(openNodes, p.nodes[oY][oX])
+  p.nodes[oY][oX] = &NodeAStar{
     gCost: 0,
-    hCost: 0,
-    parentX: x,
-    parentY: y,
+    fCost: 0,
   }
 
-  openNodes := make([]NodeAStar, 0)
-  openNodes = append(openNodes, p.nodes[y][x])
-
   for ; len(openNodes) > 0; {
-    targetNode := 0
+    index := 0
+    var current *NodeAStar
+    // Get node with lowest fCost
     for i, n := range openNodes {
-      if n.fCost < openNodes[targetNode].fCost {
-        targetNode = i
+      if n.fCost < current.fCost {
+        current = n
+        index = i
       }
     }
-    var node NodeAStar = openNodes[targetNode]
-    // remove top node from array
-    openNodes = append(openNodes[:targetNode], openNodes[targetNode+1:]...)
-
-    // Add node to closed array.
-    closedList[node.y][node.x] = true
 
     // If it is our destination then we've found a path.
-    if node.y == tY && node.x == tX {
+    if current.y == tY && current.x == tX {
       p.tracePath(tX, tY)
       p.foundPath = true
       return nil
     }
 
-    // Iterate through our eight directions
+    // Remove it.
+    openNodes = append(openNodes[:index], openNodes[index+1:]...)
+
+    // Iterate through our eight neighboring nodes.
     for i := -1; i <= 1; i++ {
       for j := -1; j <= 1; j++ {
-        if i == 0 && j == 0 {
+        // Sanity checks
+        if current.y+i < 0 || current.y+i >= p.height || current.x+j < 0 || current.x+j >= p.width {
           continue
         }
-        y = node.y + i
-        x = node.x + j
-        // Skip past if it is out of bounds.
-        if y < 0 || y >= p.height || x < 0 || x >= p.width {
-          continue
-        }
-        // Skip if it is in our closed list.
-        if closedList[y][x] == true {
-          continue
-        }
-        //if closedList[y][x] == false && p.nodes[y][x].mCost != math.MaxUint32 {
-        g := node.gCost + 1.0
-        if (math.Abs(float64(i)) + math.Abs(float64(j))) == 2 {
-          g += 0.414
-        }
-        h := p.calculateH(x, y, tX, tY)
-        f := g + h
-        // If it is not in the open list yet (signified by MaxFloat64), add it to the open list.
-        if p.nodes[y][x].fCost == math.MaxFloat64 {
-          p.nodes[y][x].fCost = f
-          p.nodes[y][x].gCost = g
-          p.nodes[y][x].hCost = h
-          p.nodes[y][x].parentY = node.y
-          p.nodes[y][x].parentX = node.x
-          openNodes = append(openNodes, p.nodes[y][x])
+        neighbor := p.nodes[current.y+i][current.x+j]
+        g := current.gCost + 1 // TODO: diagonal costs
 
-        } else if p.nodes[y][x].fCost > f { // Otherwise update it if it is a better path.
-          p.nodes[y][x].fCost = f
-          p.nodes[y][x].gCost = g
-          p.nodes[y][x].parentY = node.y
-          p.nodes[y][x].parentX = node.x
+        // The path is better. Record it.
+        if g < neighbor.gCost {
+          neighbor.parent = current
+          neighbor.gCost = g
+          neighbor.fCost = g + p.calculateH(current.x+i, current.y+j, tX, tY)
+          exists := false
+          for _, node := range openNodes {
+            if node == neighbor {
+              exists = true
+            }
+          }
+          if !exists {
+            openNodes = append(openNodes, neighbor)
+          }
         }
       }
     }
@@ -192,13 +168,13 @@ func (p *PathAStar) tracePath(tX, tY int) {
   x := tX
   path := make([]NodeAStar, 0)
 
-  for ; p.nodes[y][x].parentY != y && p.nodes[y][x].parentX != x; {
+  for ; p.nodes[y][x].parent != nil && p.nodes[y][x].parent.y != y && p.nodes[y][x].parent.x != x; {
     path = append(path, NodeAStar{
       x: x,
       y: y,
     })
-    tempX := p.nodes[y][x].parentX
-    tempY := p.nodes[y][x].parentY
+    tempX := p.nodes[y][x].parent.x
+    tempY := p.nodes[y][x].parent.y
     x = tempX
     y = tempY
   }
