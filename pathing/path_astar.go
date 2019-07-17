@@ -102,12 +102,6 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
     return errors.New("target is origin")
   }
 
-  for y, n := range p.nodes {
-    for x, _ := range n {
-      closedList[y][x] = false
-    }
-  }
-
   x := oX
   y := oY
   p.nodes[y][x] = NodeAStar{
@@ -121,7 +115,7 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
   openNodes := make([]NodeAStar, 0)
   openNodes = append(openNodes, p.nodes[y][x])
 
-  for ; len(openNodes) > 0 && len(openNodes) < p.height*p.width; {
+  for ; len(openNodes) > 0; {
     var node NodeAStar = openNodes[0]
     // remove top node from array
     openNodes = openNodes[1:]
@@ -135,7 +129,7 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
         y = node.y - i
         x = node.x - j
         // Skip past if it is out of bounds.
-        if y < 0 || y >= p.width || x < 0 || x >= p.height {
+        if y < 0 || y >= p.height || x < 0 || x >= p.width {
           continue
         }
         // If it is our destination then we've found a path.
@@ -172,7 +166,9 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
 }
 
 func (p *PathAStar) calculateH(x, y int, tX, tY int) float64 {
-  return math.Sqrt(float64((y-tY)*(y-tY) + (x-tX)*(x-tX)))
+  a := math.Pow(float64(y-tY), 2)
+  b := math.Pow(float64(x-tX), 2)
+  return math.Sqrt(a + b)
 }
 
 func (p *PathAStar) tracePath(tX, tY int) {
