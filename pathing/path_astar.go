@@ -95,14 +95,13 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
   if oX == tX && oY == tY {
     return errors.New("target is origin")
   }
-  //
+  // Set our first node's costs.
+  p.nodes[oY][oX].gCost = 0
+  p.nodes[oY][oX].fCost = p.calculateH(oX, oY, tX, tY)
 
+  // Create our open nodes slice.
   openNodes := make([]*NodeAStar, 0)
   openNodes = append(openNodes, p.nodes[oY][oX])
-  p.nodes[oY][oX] = &NodeAStar{
-    gCost: 0,
-    fCost: 0,
-  }
 
   for ; len(openNodes) > 0; {
     index := 0
