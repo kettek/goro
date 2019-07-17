@@ -124,8 +124,11 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
     closedList[node.y][node.x] = true
 
     // Iterate through our eight directions
-    for i := -1; i != 1; i+=2 {
-      for j := -1; j != 1; j+=2 {
+    for i := -1; i <= 1; i++ {
+      for j := -1; j <= 1; j++ {
+        if i == 0 && j == 0 {
+          continue
+        }
         y = node.y - i
         x = node.x - j
         // Skip past if it is out of bounds.
