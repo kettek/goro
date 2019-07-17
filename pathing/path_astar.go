@@ -68,6 +68,7 @@ func NewPathAStarFromMap(pathMap PathMap) Path {
 
 // Resize resizes the given MapBase to the provided size.
 func (p *PathAStar) Resize(width, height int) {
+  fmt.Printf("Resizing A* path to %dx%d\n", width, height)
   p.width = width
   p.height = height
 
@@ -129,8 +130,8 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
         if i == 0 && j == 0 {
           continue
         }
-        y = node.y - i
-        x = node.x - j
+        y = node.y + i
+        x = node.x + j
         // Skip past if it is out of bounds.
         if y < 0 || y >= p.height || x < 0 || x >= p.width {
           continue
@@ -145,7 +146,7 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
         }
         if closedList[y][x] == false && p.nodes[y][x].mCost != math.MaxUint32 {
           g := node.gCost + 1
-          h := p.calculateH(y, x, tX, tY)
+          h := p.calculateH(x, y, tX, tY)
           f := g + h
           //
           if p.nodes[y][x].fCost == math.MaxFloat64 || p.nodes[y][x].fCost > f {
