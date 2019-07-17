@@ -20,8 +20,7 @@ package pathing
 // Path is our interface for paths.
 type Path interface {
   Compute(oX, oY int, tX, tY int) []Step
-  HasRoute() bool
-  RouteSize() int
+  SetHeuristicsFunc(func(x0, y0 int, x1, y1 int) float64)
 }
 
 // Algorithm represents a pathing algorithm

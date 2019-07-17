@@ -33,8 +33,8 @@ type NodeAStar struct {
 // PathAStar represents a pathing structure for the A* algorithm.
 type PathAStar struct {
   width, height int
-  foundPath bool
   nodes [][]*NodeAStar
+  heuristicsFunc func(x0, y0 int, x1, y1 int) float64
 }
 
 func NewPathAStarFromMap(pathMap PathMap) Path {
@@ -131,7 +131,6 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) (steps []Step) {
     // If it is our destination then we've found a path.
     if current.y == tY && current.x == tX {
       steps = p.tracePath(tX, tY)
-      p.foundPath = true
       return
     }
 
@@ -179,10 +178,9 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) (steps []Step) {
 }
 
 func (p *PathAStar) calculateH(x, y int, tX, tY int) float64 {
-  // Manhattan Distance
-  //return math.Abs(float64(x - tX)) + math.Abs(float64(y - tY))
-  // Diagonal Distance
-  //return math.Max(math.Abs(float64(x - tX)), math.Abs(float64(y - tY)))
+  if p.heuristicsFunc != nil {
+    return p.heuristicsFunc(x, y, tX, tY)
+  }
   // Euclidean Distance
   a := math.Pow(float64(y-tY), 2)
   b := math.Pow(float64(x-tX), 2)
@@ -202,10 +200,6 @@ func (p *PathAStar) tracePath(tX, tY int) (steps []Step) {
   return
 }
 
-func (p *PathAStar) HasRoute() bool {
-  return p.foundPath
-}
-
-func (p *PathAStar) RouteSize() int {
-  return 1
+func (p *PathAStar) SetHeuristicsFunc(f func(x0, y0 int, x1, y1 int) float64) {
+  p.heuristicsFunc = f
 }
