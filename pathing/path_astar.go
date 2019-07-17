@@ -180,7 +180,7 @@ func (p *PathAStar) calculateH(x, y int, tX, tY int) float64 {
 
 func (p *PathAStar) tracePath(tX, tY int) {
   y := tY
-  x := tY
+  x := tX
   path := make([]NodeAStar, 0)
 
   for ; p.nodes[y][x].parentY != y && p.nodes[y][x].parentX != x; {
