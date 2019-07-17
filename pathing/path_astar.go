@@ -106,7 +106,7 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
 
   for ; len(openNodes) > 0; {
     index := 0
-    var current *NodeAStar
+    var current *NodeAStar = openNodes[0]
     // Get node with lowest fCost
     for i, n := range openNodes {
       if n.fCost < current.fCost {
