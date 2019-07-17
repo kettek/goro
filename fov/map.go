@@ -22,7 +22,7 @@ package fov
 type Map interface {
   Width() int
   Height() int
-  CostAt(x, y int)
+  CostAt(x, y int) int
 	Resize(width, height int)
 	Clear(fovCell Cell)
 	Reset()

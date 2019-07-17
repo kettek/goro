@@ -169,9 +169,9 @@ func (fovMap *MapBase) Height() int {
 }
 
 // Height returns the movement cost of a tile in a map. This allows fov.Maps to be used for pathing.
-func (fovMap *MapBase) CostAt(x, y int) (int, error) {
+func (fovMap *MapBase) CostAt(x, y int) int {
   if err := fovMap.CheckBounds(x, y); err != nil {
-    return math.MaxUint32, err
+    return math.MaxUint32
   }
   cost := 0
 	if fovMap.cells[y][x].BlocksMovement {
@@ -184,7 +184,7 @@ func (fovMap *MapBase) CostAt(x, y int) (int, error) {
       cost++
     }
   }
-  return cost, nil
+  return cost
 }
 
 // ToString returns a stringified view of the map.
