@@ -104,7 +104,7 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) error {
 
   for y, n := range p.nodes {
     for x, _ := range n {
-      closedList[x][y] = false
+      closedList[y][x] = false
     }
   }
 
