@@ -27,5 +27,5 @@ func (s Step) X() int {
 }
 
 func (s Step) Y() int {
-  return s.x
+  return s.y
 }
