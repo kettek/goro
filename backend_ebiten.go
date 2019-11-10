@@ -37,6 +37,7 @@ type BackendEbiten struct {
 	op                    *ebiten.DrawImageOptions
 	title                 string
 	width, height         int
+	scale                 float64
 	cellWidth, cellHeight int
 	hasStarted            bool
 	glyphs                []glyphs.Glyphs
