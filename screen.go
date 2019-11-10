@@ -125,14 +125,14 @@ func (screen *Screen) checkBounds(x, y int) error {
 }
 
 // DrawScreen draws the provided screen onto the current screen.
-func (screen *Screen) DrawScreen(startX, startY, maxWidth, maxHeight int, subscreen *Screen) error {
-	for y := 0; y < maxHeight; y++ {
-		for x := 0; x < maxWidth; x++ {
-			cell, err := subscreen.getCell(x, y)
+func (screen *Screen) DrawScreen(destX, destY, destWidth, destHeight, sourceX, sourceY int, subscreen *Screen) error {
+	for y := 0; y < destHeight; y++ {
+		for x := 0; x < destWidth; x++ {
+			cell, err := subscreen.getCell(sourceX+x, sourceY+y)
 			if err != nil {
 				continue
 			}
-			screen.DrawRune(startX+x, startY+y, cell.PendingRune, cell.PendingStyle)
+			screen.DrawRune(destX+x, destY+y, cell.PendingRune, cell.PendingStyle)
 		}
 	}
 	return nil
