@@ -59,7 +59,7 @@ func NewPathAStarFromMap(pathMap PathMap) Path {
   return path
 }
 
-func NewPathAStarFromFunc(width, height int, calcFunc func(int, int) int) Path {
+func NewPathAStarFromFunc(width, height int, calcFunc func(int, int) uint32) Path {
   path := &PathAStar{}
   path.Resize(width, height)
 
