@@ -39,6 +39,7 @@ type Screen struct {
 	Background       Color
 	Redraw           bool
 	cellsMutex       sync.Mutex
+	backend          Backend
 }
 
 // Init initializes the Screen's data structures and default values.
@@ -52,11 +53,27 @@ func (screen *Screen) Init() (err error) {
 			screen.Columns, screen.Rows = 80, 24
 		}
 	}
+	screen.backend = globalBackend
 	screen.active = true
 	screen.UseKeys = true
 	screen.AutoSize = true
 
 	return screen.Sync()
+}
+
+// NewScreen creates a new screen with the virtual backend.
+func NewScreen(width, height int) (screen *Screen, err error) {
+	screen = &Screen{
+		Columns:   width,
+		Rows:      height,
+		active:    true,
+		eventChan: make(chan Event, 10),
+		backend:   &BackendVirtual{},
+	}
+
+	err = screen.Sync()
+
+	return
 }
 
 // WaitEvent returns an Event from the Screen's event channel.
@@ -105,6 +122,28 @@ func (screen *Screen) checkBounds(x, y int) error {
 		return errors.New("x out of range")
 	}
 	return nil
+}
+
+// DrawScreen draws the provided screen onto the current screen.
+func (screen *Screen) DrawScreen(startX, startY, maxWidth, maxHeight int, subscreen *Screen) error {
+	for y := 0; y < maxHeight; y++ {
+		for x := 0; x < maxWidth; x++ {
+			cell, err := subscreen.getCell(x, y)
+			if err != nil {
+				continue
+			}
+			screen.DrawRune(startX+x, startY+y, cell.PendingRune, cell.PendingStyle)
+		}
+	}
+	return nil
+}
+
+// getCell returns the Cell at the given coordinates.
+func (screen *Screen) getCell(x, y int) (cell Cell, err error) {
+	if err = screen.checkBounds(x, y); err != nil {
+		return
+	}
+	return screen.cells[y][x], nil
 }
 
 // DrawRune draws a given rune at the position of x and y with a given style.
@@ -242,7 +281,7 @@ func (screen *Screen) Flush() {
 	screen.Redraw = true
 	defer screen.cellsMutex.Unlock()
 	// hmm. We're calling this here so we can force render the view.
-	globalBackend.Refresh()
+	screen.backend.Refresh()
 }
 
 // ForceRedraw marks each cell of the screen to be redrawn.
@@ -279,35 +318,35 @@ func (screen *Screen) SetSize(c, r int) {
 	screen.Columns = c
 	screen.Rows = r
 	screen.Sync()
-	globalBackend.SyncSize()
+	screen.backend.SyncSize()
 }
 
 // WindowSize returns the current backend's window size in its preferred units, if available.
 func (screen *Screen) WindowSize() (int, int) {
-	return globalBackend.Size()
+	return screen.backend.Size()
 }
 
 // SetWindowSize sets the current backend's window to the provided width and height in the backend's units, if available.
 func (screen *Screen) SetWindowSize(w, h int) {
-	globalBackend.SetSize(w, h)
+	screen.backend.SetSize(w, h)
 }
 
 // Scale returns the current screen window scaling. Does nothing.
 func (screen *Screen) Scale() float64 {
-	return globalBackend.Scale()
+	return screen.backend.Scale()
 }
 
 // SetScale sets the screen window's scaling. Does nothing.
 func (screen *Screen) SetScale(scale float64) {
-	globalBackend.SetScale(scale)
+	screen.backend.SetScale(scale)
 }
 
 // SetTitle sets the backend window's title to title.
 func (screen *Screen) SetTitle(title string) {
-	globalBackend.SetTitle(title)
+	screen.backend.SetTitle(title)
 }
 
 // SetGlyphs sets the screen backend's window to use the provided font. Only available for graphical backends.
 func (screen *Screen) SetGlyphs(id glyphs.ID, path string, size float64) error {
-	return globalBackend.SetGlyphs(id, path, size)
+	return screen.backend.SetGlyphs(id, path, size)
 }
