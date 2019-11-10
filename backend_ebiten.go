@@ -100,6 +100,7 @@ func (backend *BackendEbiten) Run(cb func(*Screen)) (err error) {
 		if !backend.hasStarted {
 			backend.hasStarted = true
 			backend.SyncSize()
+			ebiten.SetScreenScale(backend.scale)
 
 			go func() {
 				cb(&backend.screen)
@@ -205,12 +206,16 @@ func (backend *BackendEbiten) Units() int {
 
 // Scale returns the current backend window scaling.
 func (backend *BackendEbiten) Scale() float64 {
-	return ebiten.ScreenScale()
+	return backend.scale
 }
 
 // SetScale sets the backend window's scaling.
 func (backend *BackendEbiten) SetScale(scale float64) {
-	ebiten.SetScreenScale(scale)
+	backend.scale = scale
+
+	if backend.hasStarted {
+		ebiten.SetScreenScale(scale)
+	}
 }
 
 // SetTitle sets the backend window's title.
