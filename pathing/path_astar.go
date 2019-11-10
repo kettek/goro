@@ -27,7 +27,7 @@ type NodeAStar struct {
   parent *NodeAStar
   x, y int // for deconstructing the path
   gCost, hCost, fCost float64
-  mCost int
+  mCost uint32
 }
 
 // PathAStar represents a pathing structure for the A* algorithm.

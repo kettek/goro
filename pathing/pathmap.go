@@ -25,7 +25,7 @@ import (
 type PathMap interface {
   Width() int
   Height() int
-  CostAt(x, y int) int
+  CostAt(x, y int) uint32
 }
 
 const (
