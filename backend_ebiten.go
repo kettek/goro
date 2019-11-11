@@ -74,6 +74,7 @@ func (backend *BackendEbiten) Init() error {
 	backend.title = "goro - Ebiten"
 	backend.width = 320
 	backend.height = 240
+	backend.scale = 1
 
 	backend.SetGlyphsFromTTFBytes(0, resources.GoroTTF, 16)
 
