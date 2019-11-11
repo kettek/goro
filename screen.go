@@ -129,10 +129,11 @@ func (screen *Screen) DrawScreen(destX, destY, destWidth, destHeight, sourceX, s
 	for y := 0; y < destHeight; y++ {
 		for x := 0; x < destWidth; x++ {
 			cell, err := subscreen.getCell(sourceX+x, sourceY+y)
-			if err != nil {
-				continue
+			if err == nil {
+				screen.DrawRune(destX+x, destY+y, cell.PendingRune, cell.PendingStyle)
+			} else {
+				screen.DrawRune(destX+x, destY+y, ' ', Style{})
 			}
-			screen.DrawRune(destX+x, destY+y, cell.PendingRune, cell.PendingStyle)
 		}
 	}
 	return nil
