@@ -19,8 +19,9 @@ package pathing
 
 // Path is our interface for paths.
 type Path interface {
-  Compute(oX, oY int, tX, tY int) []Step
-  SetHeuristicsFunc(func(x0, y0 int, x1, y1 int) float64)
+	Compute(oX, oY int, tX, tY int) []Step
+	SetHeuristicsFunc(func(x0, y0 int, x1, y1 int) float64)
+	AllowDiagonals(v bool)
 }
 
 // Algorithm represents a pathing algorithm
@@ -29,7 +30,7 @@ type Algorithm uint8
 // Our default algorithms
 const (
 	AlgorithmNone Algorithm = iota
-  AlgorithmAStar
+	AlgorithmAStar
 )
 
 // NewPathFromMap returns a new pathing map from the given pathMap interface.
