@@ -175,7 +175,7 @@ func (p *PathAStar) Compute(oX, oY int, tX, tY int) (steps []Step) {
 			}
 			g := current.gCost + 1 + float64(neighbor.mCost)
 			// Add extra diagonal cost.
-			if (math.Abs(float64(i)) + math.Abs(float64(j))) == 2 {
+			if p.diagonals && (math.Abs(float64(i))+math.Abs(float64(j))) == 2 {
 				g += .414
 			}
 
